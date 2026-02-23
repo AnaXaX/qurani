@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../shared/widgets/feature_tile.dart';
+import '../../../../shared/widgets/gradient_header.dart';
 import '../../../azkar/presentation/screens/azkar_screen.dart';
 import '../../../prayer_times/presentation/screens/prayer_times_screen.dart';
 import '../../../prayer_times/presentation/screens/qibla_screen.dart';
@@ -6,6 +9,9 @@ import '../../../prayer_times/presentation/screens/hijri_screen.dart';
 import '../../../donate/presentation/screens/donate_screen.dart';
 import '../../../hifz/presentation/screens/hifz_setup_screen.dart';
 import '../../../reading_plans/presentation/screens/khatmah_screen.dart';
+import '../../../duas/presentation/screens/duas_screen.dart';
+import '../../../ahkam/presentation/screens/ahkam_screen.dart';
+import '../../../ahadith/presentation/screens/ahadith_screen.dart';
 import 'settings_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -13,167 +19,160 @@ class MoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('More')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.zero,
         children: [
-          // Feature grid
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: [
-              _FeatureTile(
-                icon: Icons.access_time_rounded,
-                label: 'Prayer Times',
-                color: Colors.teal,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const PrayerTimesScreen()),
-                ),
-              ),
-              _FeatureTile(
-                icon: Icons.auto_awesome_rounded,
-                label: 'Azkar',
-                color: Colors.indigo,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AzkarScreen()),
-                ),
-              ),
-              _FeatureTile(
-                icon: Icons.explore_rounded,
-                label: 'Qibla',
-                color: Colors.deepOrange,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const QiblaScreen()),
-                ),
-              ),
-              _FeatureTile(
-                icon: Icons.calendar_month_rounded,
-                label: 'Hijri',
-                color: Colors.purple,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HijriScreen()),
-                ),
-              ),
-              _FeatureTile(
-                icon: Icons.menu_book_rounded,
-                label: 'Hifz',
-                color: Colors.green,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const HifzSetupScreen()),
-                ),
-              ),
-              _FeatureTile(
-                icon: Icons.track_changes_rounded,
-                label: 'Khatmah',
-                color: Colors.blue,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const KhatmahScreen()),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // Settings and about
-          ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primaryContainer
-                    .withAlpha(77),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(Icons.settings_rounded,
-                  color: Theme.of(context).colorScheme.primary),
+          GradientHeader(
+            gradient: isDark
+                ? AppColors.gradientGreenDark
+                : AppColors.gradientGreen,
+            height: 140,
+            showMosque: true,
+            padding: EdgeInsets.fromLTRB(
+              24, MediaQuery.of(context).padding.top + 12, 24, 20,
             ),
-            title: const Text('Settings'),
-            subtitle: const Text('Theme, language, audio preferences'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'More',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white.withAlpha(230),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Explore all features',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withAlpha(170),
+                  ),
+                ),
+              ],
             ),
           ),
-          const Divider(),
-          ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.pink.withAlpha(26),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.favorite_rounded, color: Colors.pink),
-            ),
-            title: const Text('Support Qurani'),
-            subtitle:
-                const Text('Help keep this app free - Sadaqah Jariyah'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const DonateScreen()),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Feature grid — 3 columns, 3 rows
+                GridView.count(
+                  crossAxisCount: 3,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 0.85,
+                  children: [
+                    FeatureTile(
+                      icon: Icons.access_time_rounded,
+                      label: 'Prayer',
+                      color: AppColors.accentPrayer,
+                      onTap: () => _push(context, const PrayerTimesScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.auto_awesome_rounded,
+                      label: 'Azkar',
+                      color: AppColors.accentAzkar,
+                      onTap: () => _push(context, const AzkarScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.explore_rounded,
+                      label: 'Qibla',
+                      color: AppColors.accentQibla,
+                      onTap: () => _push(context, const QiblaScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.calendar_month_rounded,
+                      label: 'Hijri',
+                      color: AppColors.accentHijri,
+                      onTap: () => _push(context, const HijriScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.menu_book_rounded,
+                      label: 'Hifz',
+                      color: AppColors.accentHifz,
+                      onTap: () => _push(context, const HifzSetupScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.track_changes_rounded,
+                      label: 'Khatmah',
+                      color: AppColors.accentKhatmah,
+                      onTap: () => _push(context, const KhatmahScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.volunteer_activism_rounded,
+                      label: "Du'as",
+                      color: AppColors.accentDua,
+                      onTap: () => _push(context, const DuasScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.gavel_rounded,
+                      label: 'Ahkam',
+                      color: AppColors.accentAhkam,
+                      onTap: () => _push(context, const AhkamScreen()),
+                    ),
+                    FeatureTile(
+                      icon: Icons.auto_stories_rounded,
+                      label: 'Ahadith',
+                      color: AppColors.accentAhadith,
+                      onTap: () => _push(context, const AhadithScreen()),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                // Settings
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withAlpha(77),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.settings_rounded,
+                        color: Theme.of(context).colorScheme.primary),
+                  ),
+                  title: const Text('Settings'),
+                  subtitle: const Text('Theme, language, audio preferences'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _push(context, const SettingsScreen()),
+                ),
+                const Divider(),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.pink.withAlpha(26),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child:
+                        const Icon(Icons.favorite_rounded, color: Colors.pink),
+                  ),
+                  title: const Text('Support Qurani'),
+                  subtitle: const Text(
+                      'Help keep this app free - Sadaqah Jariyah'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _push(context, const DonateScreen()),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _FeatureTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _FeatureTile({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withAlpha(51)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+  void _push(BuildContext context, Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
+
 }

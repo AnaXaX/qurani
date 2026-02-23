@@ -12,6 +12,17 @@ Used **only locally on your device** to calculate prayer times and Qibla directi
 ### Audio Recordings
 Used **only locally** for tajweed practice comparison (recording your recitation to compare with a sheikh). Recordings are stored temporarily on your device and are never uploaded or shared.
 
+## Offline Content
+
+The following features use data bundled entirely within the app. No network requests are made and no data is collected:
+
+- **Du'as** — ~100 authentic supplications stored locally
+- **Ahkam** — Islamic rulings from 4 madhabs stored locally
+- **Ahadith** — Hadith collections (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah) stored locally
+- **Azkar** — Morning, evening, after-salah, and sleep azkar stored locally
+- **Hifz** — Memorization mode operates entirely on-device
+- **Khatmah** — Reading plans tracked locally on your device
+
 ## Data We Do NOT Collect
 
 - No personal information
@@ -58,7 +69,7 @@ If we update this privacy policy, we will post the changes here with an updated 
 
 ## Contact
 
-If you have questions about this privacy policy, please open an issue on our GitHub repository.
+If you have questions about this privacy policy, please open an issue on our GitHub repository or send an email to anas.boudyach@gmail.com.
 
 ---
 

@@ -48,16 +48,44 @@ class MiniPlayerWidget extends ConsumerWidget {
         );
       },
       child: Container(
-        height: 56,
+        height: 64,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).colorScheme.outline.withAlpha(51),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.shadow.withAlpha(20),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
             ),
-          ),
+          ],
         ),
-        child: Row(
+        child: Column(
+          children: [
+          // Thin progress line at top
+          Consumer(builder: (context, ref, _) {
+            final position = ref.watch(
+              currentAudioStateProvider.select((s) => s.position),
+            );
+            final duration = ref.watch(
+              currentAudioStateProvider.select((s) => s.duration),
+            );
+            final progress = duration.inMilliseconds > 0
+                ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+                : 0.0;
+            return ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 2,
+                backgroundColor: Colors.transparent,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            );
+          }),
+          Expanded(child: Row(
           children: [
             const SizedBox(width: 16),
             // Surah info (rebuilds only on track change)
@@ -87,34 +115,6 @@ class MiniPlayerWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            // Progress indicator (isolated — rebuilds on position/duration only)
-            Consumer(builder: (context, ref, _) {
-              final position = ref.watch(
-                currentAudioStateProvider.select((s) => s.position),
-              );
-              final duration = ref.watch(
-                currentAudioStateProvider.select((s) => s.duration),
-              );
-              if (duration <= Duration.zero) return const SizedBox.shrink();
-              return SizedBox(
-                width: 48,
-                height: 48,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      value: position.inMilliseconds /
-                          duration.inMilliseconds,
-                      strokeWidth: 2,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withAlpha(51),
-                    ),
-                  ],
-                ),
-              );
-            }),
             // Play/Pause button (isolated — rebuilds on play state only)
             Consumer(builder: (context, ref, _) {
               final isPlaying = ref.watch(
@@ -149,6 +149,8 @@ class MiniPlayerWidget extends ConsumerWidget {
               },
             ),
             const SizedBox(width: 4),
+          ],
+        )),
           ],
         ),
       ),

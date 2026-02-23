@@ -14,9 +14,12 @@ class AppTheme {
         secondary: AppColors.secondaryGold,
         onSecondary: Colors.white,
         secondaryContainer: const Color(0xFFFFF8E1),
+        tertiary: const Color(0xFF0D47A1),
+        onTertiary: Colors.white,
         surface: AppColors.lightSurface,
         onSurface: AppColors.lightOnSurface,
         scaffoldBackground: AppColors.lightBackground,
+        shadowColor: const Color(0x1A000000),
       );
 
   static ThemeData get dark => _buildTheme(
@@ -27,9 +30,12 @@ class AppTheme {
         secondary: AppColors.secondaryGoldLight,
         onSecondary: AppColors.secondaryGoldDark,
         secondaryContainer: AppColors.secondaryGoldDark,
+        tertiary: const Color(0xFF64B5F6),
+        onTertiary: const Color(0xFF0A1628),
         surface: AppColors.darkSurface,
         onSurface: AppColors.darkOnSurface,
         scaffoldBackground: AppColors.darkBackground,
+        shadowColor: const Color(0x33000000),
       );
 
   static ThemeData get sepia => _buildTheme(
@@ -40,9 +46,12 @@ class AppTheme {
         secondary: AppColors.secondaryGold,
         onSecondary: Colors.white,
         secondaryContainer: const Color(0xFFFFF8E1),
+        tertiary: const Color(0xFF795548),
+        onTertiary: Colors.white,
         surface: AppColors.sepiaSurface,
         onSurface: AppColors.sepiaOnSurface,
         scaffoldBackground: AppColors.sepiaBackground,
+        shadowColor: const Color(0x1A3E2723),
       );
 
   static ThemeData get amoled => _buildTheme(
@@ -53,9 +62,12 @@ class AppTheme {
         secondary: AppColors.secondaryGoldLight,
         onSecondary: AppColors.secondaryGoldDark,
         secondaryContainer: AppColors.secondaryGoldDark,
+        tertiary: const Color(0xFF64B5F6),
+        onTertiary: const Color(0xFF000000),
         surface: AppColors.amoledSurface,
         onSurface: AppColors.amoledOnSurface,
         scaffoldBackground: AppColors.amoledBackground,
+        shadowColor: const Color(0x00000000),
       );
 
   static ThemeData forMode(AppThemeMode mode) {
@@ -79,9 +91,12 @@ class AppTheme {
     required Color secondary,
     required Color onSecondary,
     required Color secondaryContainer,
+    required Color tertiary,
+    required Color onTertiary,
     required Color surface,
     required Color onSurface,
     required Color scaffoldBackground,
+    required Color shadowColor,
   }) {
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -93,10 +108,13 @@ class AppTheme {
       onSecondary: onSecondary,
       secondaryContainer: secondaryContainer,
       onSecondaryContainer: onSurface,
+      tertiary: tertiary,
+      onTertiary: onTertiary,
       surface: surface,
       onSurface: onSurface,
       error: AppColors.error,
       onError: Colors.white,
+      shadow: shadowColor,
     );
 
     return ThemeData(
@@ -118,9 +136,10 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surface,
-        elevation: 1,
+        elevation: 2,
+        shadowColor: shadowColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

@@ -33,6 +33,24 @@ Built with Flutter as Sadaqah Jariyah (ongoing charity).
 - Live countdown to next prayer
 - Qibla compass with real-time direction
 
+### Du'as — 100+ Authentic Supplications
+- 12 categories: Morning, Evening, Sleep, Waking, Mosque, Eating, Travel, Rain, Healing, Forgiveness, Parents, Difficulty
+- Arabic text with transliteration and English translation
+- Authentic references from Quran, Bukhari, Muslim, and more
+- Tap-to-count for repeated du'as, copy to clipboard
+
+### Ahkam — Islamic Rulings (4 Madhabs)
+- 8 categories: Purification, Prayer, Fasting, Zakat, Hajj, Marriage, Food, Daily Life
+- Side-by-side rulings from Hanafi, Maliki, Shafi'i, and Hanbali schools
+- Quran and Hadith evidence for each position
+- 40+ topics with expandable details and key points
+
+### Ahadith — Hadith Collections
+- 6 major collections: Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah
+- Arabic text with English translation
+- Narrator chains and authenticity grading (Sahih, Hasan, Da'if)
+- Fully offline — all data bundled in the app
+
 ### Azkar & Tasbih
 - Morning, evening, after salah, and sleep azkar
 - Built-in tasbih counter with haptic feedback
@@ -86,6 +104,9 @@ lib/
     tajweed_course/ # 24 lessons, quizzes, recording
     prayer_times/ # Prayer times, Qibla, Hijri
     azkar/        # Azkar with tasbih counter
+    duas/         # 100+ du'as across 12 categories
+    ahkam/        # Islamic rulings (4 madhabs)
+    ahadith/      # 6 hadith collections
     hifz/         # Memorization mode
     reading_plans/# Khatmah plans
     settings/     # App settings, more screen

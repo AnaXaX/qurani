@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../shared/widgets/gradient_header.dart';
 
 /// Azkar categories and their content.
 class _AzkarCategory {
@@ -86,56 +88,107 @@ class AzkarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(title: const Text('Azkar')),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _categories.length,
-        itemBuilder: (context, index) {
-          final category = _categories[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: category.color.withAlpha(26),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(category.icon, color: category.color),
-              ),
-              title: Text(
-                category.title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                category.titleArabic,
-                style: const TextStyle(fontFamily: 'AmiriQuran', fontSize: 16),
-                textDirection: TextDirection.rtl,
-              ),
-              trailing: Text(
-                '${category.items.length}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: category.color,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        _AzkarListScreen(category: category),
-                  ),
-                );
-              },
+      body: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          GradientHeader(
+            gradient: isDark ? AppColors.gradientGoldDark : AppColors.gradientGold,
+            height: 160,
+            padding: EdgeInsets.fromLTRB(
+              24, MediaQuery.of(context).padding.top + 8, 24, 20,
             ),
-          );
-        },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Azkar',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white.withAlpha(230),
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                Text(
+                  'أذكار المسلم',
+                  style: TextStyle(
+                    fontFamily: 'AmiriQuran',
+                    fontSize: 20,
+                    color: Colors.white.withAlpha(200),
+                  ),
+                  textDirection: TextDirection.rtl,
+                ),
+                Text(
+                  '${_categories.length} categories',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withAlpha(160),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListView.builder(
+            padding: const EdgeInsets.all(16),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _categories.length,
+            itemBuilder: (context, index) {
+              final category = _categories[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: category.color.withAlpha(26),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(category.icon, color: category.color),
+                  ),
+                  title: Text(
+                    category.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    category.titleArabic,
+                    style: const TextStyle(fontFamily: 'AmiriQuran', fontSize: 16),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  trailing: Text(
+                    '${category.items.length}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: category.color,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            _AzkarListScreen(category: category),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

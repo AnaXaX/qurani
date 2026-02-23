@@ -567,3 +567,39 @@ MIT License — free to use, modify, and distribute.
 - PRIVACY_POLICY.md: for Google Play Store listing
 - `.claude/` and `.vscode/` added to .gitignore
 - Git history cleaned: single commit, no Co-Authored-By lines
+
+## Session Work (Feb 23, 2026) — UI Overhaul + New Features
+
+### UI Design Overhaul
+- **Color palette**: 12 feature accent colors + 6 gradient pairs (with dark variants) in `app_colors.dart`
+- **Theme upgrade**: Card border radius 12→16, elevation 2 with shadow, tertiary color in ColorScheme
+- **GradientHeader**: Reusable gradient header widget with mosque silhouette (CustomPainter)
+- **FeatureTile**: Shared colorful rounded-square icon tile for feature grids
+- **Dashboard overhaul**: Sky gradient header with greeting + daily ayah, continue reading card with progress bar, 3x2 feature grid
+- **Mini player polish**: Height 56→64, rounded top corners, thin progress line at top, shadow (visual only — zero audio changes)
+- **Reading screen**: Ayah cards radius 12→16, subtle shadow instead of border
+- **Azkar screen**: Gold gradient header replacing plain AppBar
+- **More screen**: Green gradient header, 3x3 feature grid with Du'as/Ahkam/Ahadith tiles, shared FeatureTile component
+
+### New Features: Du'as
+- `lib/features/duas/` — complete feature with data + screens
+- `DuaCategory` + `Dua` models (arabic, transliteration, translation, reference, repeatCount)
+- ~100 authentic du'as across 12 categories (Morning, Evening, Sleep, Waking, Mosque, Eating, Travel, Rain, Healing, Forgiveness, Parents, Difficulty)
+- Category list screen with orange gradient header
+- Du'a detail with tap-to-count, copy button, reference display
+
+### New Features: Ahkam (Islamic Rulings)
+- `lib/features/ahkam/` — complete feature with data + screens
+- `AhkamCategory` + `AhkamTopic` + `MadhabRuling` models
+- ~40 topics across 8 categories: Taharah, Salah, Sawm, Zakat, Hajj, Nikah, Food, Daily Life
+- Multi-madhab: each topic shows rulings from Hanafi, Maliki, Shafi'i, Hanbali with Quran/Hadith evidence
+- Expandable topic cards with color-coded madhab ruling cards
+- Cyan gradient header
+
+### New Features: Ahadith (Hadith Collections)
+- `lib/features/ahadith/` — complete feature with data + screens
+- `HadithCollection` + `HadithBook` + `Hadith` models with grade enum
+- 6 collections: Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah
+- 3 books per collection, 5 hadiths per book (90 total bundled, static offline)
+- Grade badges (Sahih=green, Hasan=amber, Da'if=red), narrator display, copy button
+- Deep red gradient header, collection → books → hadiths navigation
