@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _fontSizeKey = 'reading_font_size';
 const _translationKey = 'default_translation';
 const _reciterKey = 'default_reciter';
+const _tajweedKey = 'show_tajweed_colors';
+const _numeralStyleKey = 'numeral_style';
 
 // ─── Font Size ───
 
@@ -152,4 +154,62 @@ class ReciterOption {
   final String id;
   final String name;
   const ReciterOption(this.id, this.name);
+}
+
+// ─── Tajweed Colors Toggle ───
+
+final tajweedProvider =
+    StateNotifierProvider<TajweedNotifier, bool>((ref) {
+  return TajweedNotifier();
+});
+
+class TajweedNotifier extends StateNotifier<bool> {
+  TajweedNotifier() : super(false) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getBool(_tajweedKey) ?? false;
+  }
+
+  Future<void> toggle() async {
+    state = !state;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_tajweedKey, state);
+  }
+}
+
+// ─── Numeral Style (Arabic-Indic vs Western) ───
+
+enum NumeralStyle { arabic, western }
+
+final numeralStyleProvider =
+    StateNotifierProvider<NumeralStyleNotifier, NumeralStyle>((ref) {
+  return NumeralStyleNotifier();
+});
+
+class NumeralStyleNotifier extends StateNotifier<NumeralStyle> {
+  NumeralStyleNotifier() : super(NumeralStyle.arabic) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final value = prefs.getString(_numeralStyleKey);
+    if (value == 'western') state = NumeralStyle.western;
+  }
+
+  Future<void> setStyle(NumeralStyle style) async {
+    state = style;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_numeralStyleKey, style.name);
+  }
+}
+
+/// Format a number according to the chosen numeral style.
+String formatAyahNumber(int number, NumeralStyle style) {
+  if (style == NumeralStyle.western) return '$number';
+  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return number.toString().split('').map((d) => arabicDigits[int.parse(d)]).join();
 }

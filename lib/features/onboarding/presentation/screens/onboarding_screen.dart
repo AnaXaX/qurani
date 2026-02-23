@@ -456,12 +456,15 @@ class _PreferencesPage extends ConsumerWidget {
     final translation = ref.watch(defaultTranslationProvider);
     final reciter = ref.watch(defaultReciterProvider);
     final fontSize = ref.watch(fontSizeProvider);
+    final showTajweed = ref.watch(tajweedProvider);
+    final numeralStyle = ref.watch(numeralStyleProvider);
 
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 24),
           Text(
             'Reading Preferences',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -478,7 +481,29 @@ class _PreferencesPage extends ConsumerWidget {
                       .withAlpha(153),
                 ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          // Tajweed toggle
+          _ToggleCard(
+            icon: Icons.color_lens_outlined,
+            title: 'Tajweed Colors',
+            subtitle: showTajweed ? 'Colored tajweed rules on text' : 'Plain Arabic text',
+            value: showTajweed,
+            onChanged: (_) => ref.read(tajweedProvider.notifier).toggle(),
+          ),
+          // Numeral style
+          _PreferenceCard(
+            icon: Icons.format_list_numbered,
+            title: 'Ayah Numbers',
+            subtitle: numeralStyle == NumeralStyle.arabic
+                ? 'Arabic-Indic (١ ٢ ٣)'
+                : 'Western (1 2 3)',
+            onTap: () {
+              final next = numeralStyle == NumeralStyle.arabic
+                  ? NumeralStyle.western
+                  : NumeralStyle.arabic;
+              ref.read(numeralStyleProvider.notifier).setStyle(next);
+            },
+          ),
           _PreferenceCard(
             icon: Icons.translate,
             title: 'Translation',
@@ -497,7 +522,7 @@ class _PreferencesPage extends ConsumerWidget {
             subtitle: _fontSizeLabel(fontSize),
             onTap: () => _showFontSizePicker(context, ref),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'You can change these anytime in Settings.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -507,6 +532,7 @@ class _PreferencesPage extends ConsumerWidget {
                       .withAlpha(128),
                 ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -647,6 +673,37 @@ class _PreferenceCard extends StatelessWidget {
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right, size: 20),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _ToggleCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: SwitchListTile(
+        secondary: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        value: value,
+        onChanged: onChanged,
       ),
     );
   }

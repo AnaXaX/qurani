@@ -266,23 +266,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   loading: () => const SizedBox.shrink(),
                   error: (_, __) => const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 20),
-
-                // ── Features Header ──
-                Text(
-                  'Features',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
                 const SizedBox(height: 12),
 
                 // ── 4x3 Feature Grid with staggered animation ──
                 StaggeredAnimationGrid(
                   crossAxisCount: 4,
-                  childAspectRatio: 0.80,
-                  mainAxisSpacing: 6,
-                  crossAxisSpacing: 4,
+                  childAspectRatio: 1.0,
+                  mainAxisSpacing: 0,
+                  crossAxisSpacing: 0,
                   children: [
                     FeatureTile(
                       icon: Icons.menu_book_rounded,

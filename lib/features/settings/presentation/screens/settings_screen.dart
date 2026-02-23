@@ -56,6 +56,22 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showFontSizePicker(context, ref, currentFontSize),
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.color_lens_outlined),
+            title: const Text('Tajweed Colors'),
+            subtitle: const Text('Show colored tajweed rules on text'),
+            value: ref.watch(tajweedProvider),
+            onChanged: (_) => ref.read(tajweedProvider.notifier).toggle(),
+          ),
+          ListTile(
+            leading: const Icon(Icons.format_list_numbered),
+            title: const Text('Ayah Numbers'),
+            subtitle: Text(ref.watch(numeralStyleProvider) == NumeralStyle.arabic
+                ? 'Arabic-Indic (١ ٢ ٣)'
+                : 'Western (1 2 3)'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showNumeralStylePicker(context, ref),
+          ),
 
           // ─── Audio ───
           _SectionHeader(title: 'Audio'),
@@ -428,6 +444,61 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Numeral Style Picker ───
+
+  void _showNumeralStylePicker(BuildContext context, WidgetRef ref) {
+    final current = ref.read(numeralStyleProvider);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _bottomSheetHandle(),
+            const SizedBox(height: 20),
+            Text(
+              'Ayah Numbers Style',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            RadioListTile<NumeralStyle>(
+              value: NumeralStyle.arabic,
+              groupValue: current,
+              title: const Text('Arabic-Indic'),
+              subtitle: const Text('١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩'),
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(numeralStyleProvider.notifier).setStyle(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<NumeralStyle>(
+              value: NumeralStyle.western,
+              groupValue: current,
+              title: const Text('Western'),
+              subtitle: const Text('1 2 3 4 5 6 7 8 9'),
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(numeralStyleProvider.notifier).setStyle(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );

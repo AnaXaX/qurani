@@ -120,6 +120,7 @@ class _StaggeredAnimationGridState extends State<StaggeredAnimationGrid>
       crossAxisCount: widget.crossAxisCount,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
       mainAxisSpacing: widget.mainAxisSpacing,
       crossAxisSpacing: widget.crossAxisSpacing,
       childAspectRatio: widget.childAspectRatio,

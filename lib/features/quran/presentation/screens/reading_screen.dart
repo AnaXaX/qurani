@@ -32,9 +32,23 @@ class ReadingScreen extends ConsumerStatefulWidget {
 }
 
 class _ReadingScreenState extends ConsumerState<ReadingScreen> {
+  static final RegExp _htmlTagRegex = RegExp(r'<[^>]*>');
+  /// Matches trailing ayah-end sign (۝) + Arabic-Indic digits at end of text.
+  static final RegExp _ayahEndMarkerRegex = RegExp(r'[\s\u06DD]*[\u0660-\u0669]+\s*$');
   ReadingMode _mode = ReadingMode.translation;
   double _fontSize = 28.0;
   bool _showTranslation = true;
+
+  /// Plain text fallback: if textUthmani is empty, strip HTML from tajweed.
+  String _plainText(Ayah ayah) {
+    if (ayah.textUthmani.isNotEmpty) return ayah.textUthmani;
+    return ayah.textUthmaniTajweed?.replaceAll(_htmlTagRegex, '') ?? '';
+  }
+
+  /// Plain text with trailing ayah number stripped (for card-based modes).
+  String _plainTextNoNumber(Ayah ayah) {
+    return _plainText(ayah).replaceAll(_ayahEndMarkerRegex, '').trimRight();
+  }
 
   @override
   void initState() {
@@ -72,52 +86,59 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
           ],
         ),
         actions: [
-          // Reading mode toggle
-          PopupMenuButton<ReadingMode>(
-            icon: const Icon(Icons.view_agenda_outlined),
-            tooltip: 'Reading mode',
-            onSelected: (mode) => setState(() => _mode = mode),
-            itemBuilder: (_) => [
-              _modeMenuItem(ReadingMode.translation, 'Translation',
-                  Icons.translate),
-              _modeMenuItem(
-                  ReadingMode.mushaf, 'Mushaf', Icons.menu_book_outlined),
-              _modeMenuItem(
-                  ReadingMode.split, 'Split', Icons.vertical_split_outlined),
-            ],
-          ),
-          // Font size
-          PopupMenuButton<double>(
-            icon: const Icon(Icons.text_fields),
-            tooltip: 'Font size',
-            onSelected: (size) => setState(() => _fontSize = size),
-            itemBuilder: (_) => [
-              _fontSizeItem(22, 'Small'),
-              _fontSizeItem(28, 'Medium'),
-              _fontSizeItem(34, 'Large'),
-              _fontSizeItem(40, 'Extra Large'),
-            ],
-          ),
-          // Translation picker
-          IconButton(
-            icon: const Icon(Icons.translate),
-            tooltip: 'Change translation',
-            onPressed: () => _showTranslationPicker(),
-          ),
-          // Continuous playback toggle (isolated with select)
           Consumer(builder: (context, ref, _) {
+            final showTajweed = ref.watch(tajweedProvider);
             final continuous = ref.watch(
               currentAudioStateProvider.select((s) => s.continuousMode),
             );
-            return IconButton(
-              icon: Icon(
-                continuous ? Icons.playlist_play_rounded : Icons.looks_one_rounded,
-                color: continuous ? Theme.of(context).colorScheme.primary : null,
-              ),
-              tooltip: continuous ? 'Continuous playback (on)' : 'Single ayah playback',
-              onPressed: () {
-                ref.read(audioPlayerServiceProvider).toggleContinuousMode();
+            return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: 'Options',
+              onSelected: (value) {
+                switch (value) {
+                  case 'mode_translation':
+                    setState(() => _mode = ReadingMode.translation);
+                  case 'mode_mushaf':
+                    setState(() => _mode = ReadingMode.mushaf);
+                  case 'mode_split':
+                    setState(() => _mode = ReadingMode.split);
+                  case 'font_22':
+                    setState(() => _fontSize = 22);
+                  case 'font_28':
+                    setState(() => _fontSize = 28);
+                  case 'font_34':
+                    setState(() => _fontSize = 34);
+                  case 'font_40':
+                    setState(() => _fontSize = 40);
+                  case 'tajweed':
+                    ref.read(tajweedProvider.notifier).toggle();
+                  case 'translation':
+                    _showTranslationPicker();
+                  case 'continuous':
+                    ref.read(audioPlayerServiceProvider).toggleContinuousMode();
+                }
               },
+              itemBuilder: (_) => [
+                // ── Reading Mode ──
+                const PopupMenuItem(enabled: false, height: 32, child: Text('Reading Mode', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
+                _checkItem('mode_translation', 'Translation', Icons.translate, _mode == ReadingMode.translation),
+                _checkItem('mode_mushaf', 'Mushaf', Icons.menu_book_outlined, _mode == ReadingMode.mushaf),
+                _checkItem('mode_split', 'Split View', Icons.vertical_split_outlined, _mode == ReadingMode.split),
+                const PopupMenuDivider(),
+                // ── Font Size ──
+                const PopupMenuItem(enabled: false, height: 32, child: Text('Font Size', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
+                _checkItem('font_22', 'Small', Icons.text_fields, _fontSize == 22),
+                _checkItem('font_28', 'Medium', Icons.text_fields, _fontSize == 28),
+                _checkItem('font_34', 'Large', Icons.text_fields, _fontSize == 34),
+                _checkItem('font_40', 'Extra Large', Icons.text_fields, _fontSize == 40),
+                const PopupMenuDivider(),
+                // ── Toggles ──
+                _checkItem('tajweed', 'Tajweed Colors', Icons.color_lens_outlined, showTajweed),
+                _checkItem('continuous', 'Continuous Playback', Icons.playlist_play_rounded, continuous),
+                const PopupMenuDivider(),
+                // ── Actions ──
+                const PopupMenuItem(value: 'translation', child: Row(children: [Icon(Icons.language, size: 20), SizedBox(width: 12), Text('Change Translation')])),
+              ],
             );
           }),
         ],
@@ -145,36 +166,16 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
     );
   }
 
-  PopupMenuItem<ReadingMode> _modeMenuItem(
-      ReadingMode mode, String label, IconData icon) {
+  PopupMenuItem<String> _checkItem(String value, String label, IconData icon, bool checked) {
     return PopupMenuItem(
-      value: mode,
+      value: value,
       child: Row(
         children: [
           Icon(icon, size: 20),
           const SizedBox(width: 12),
-          Text(label),
-          if (_mode == mode) ...[
-            const Spacer(),
-            Icon(Icons.check,
-                size: 18, color: Theme.of(context).colorScheme.primary),
-          ],
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem<double> _fontSizeItem(double size, String label) {
-    return PopupMenuItem(
-      value: size,
-      child: Row(
-        children: [
-          Text(label),
-          if (_fontSize == size) ...[
-            const Spacer(),
-            Icon(Icons.check,
-                size: 18, color: Theme.of(context).colorScheme.primary),
-          ],
+          Expanded(child: Text(label)),
+          if (checked)
+            Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.primary),
         ],
       ),
     );
@@ -443,7 +444,7 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  '${ayah.ayahNumber}',
+                  formatAyahNumber(ayah.ayahNumber, ref.watch(numeralStyleProvider)),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.bold,
@@ -468,15 +469,15 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          // Arabic text with tajweed
-          if (ayah.textUthmaniTajweed != null) ...[
+          // Arabic text (tajweed or plain based on preference)
+          if (ref.watch(tajweedProvider) && ayah.textUthmaniTajweed != null) ...[
             TajweedTextWidget(
               textUthmaniTajweed: ayah.textUthmaniTajweed!,
               fontSize: _fontSize,
             ),
           ] else ...[
             Text(
-              ayah.textUthmani,
+              _plainTextNoNumber(ayah),
               style: TextStyle(
                 fontFamily: 'AmiriQuran',
                 fontSize: _fontSize,
@@ -651,8 +652,7 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                   TextSpan(
                     children: ayahs.map((ayah) {
                       return TextSpan(
-                        text:
-                            '${ayah.textUthmani} \u06DD${_toArabicNumeral(ayah.ayahNumber)} ',
+                        text: '${_plainText(ayah)} ',
                         style: TextStyle(
                           fontFamily: 'AmiriQuran',
                           fontSize: _fontSize,
@@ -731,7 +731,7 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${ayah.ayahNumber}.',
+                                '${formatAyahNumber(ayah.ayahNumber, ref.watch(numeralStyleProvider))}.',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).colorScheme.primary,
@@ -764,21 +764,31 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
                                   right: Radius.circular(12))
                               : BorderRadius.circular(12),
                         ),
-                        child: ayah.textUthmaniTajweed != null
-                            ? TajweedTextWidget(
-                                textUthmaniTajweed: ayah.textUthmaniTajweed!,
-                                fontSize: _fontSize * 0.85,
-                              )
-                            : Text(
-                                ayah.textUthmani,
-                                style: TextStyle(
-                                  fontFamily: 'AmiriQuran',
-                                  fontSize: _fontSize * 0.85,
-                                  height: 1.8,
-                                ),
-                                textDirection: TextDirection.rtl,
-                                textAlign: TextAlign.center,
-                              ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Spacer(),
+                                _playPauseButton(ayah.ayahNumber),
+                              ],
+                            ),
+                            (ref.watch(tajweedProvider) && ayah.textUthmaniTajweed != null)
+                                ? TajweedTextWidget(
+                                    textUthmaniTajweed: ayah.textUthmaniTajweed!,
+                                    fontSize: _fontSize * 0.85,
+                                  )
+                                : Text(
+                                    _plainTextNoNumber(ayah),
+                                    style: TextStyle(
+                                      fontFamily: 'AmiriQuran',
+                                      fontSize: _fontSize * 0.85,
+                                      height: 1.8,
+                                    ),
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+                                  ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -791,13 +801,4 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen> {
     );
   }
 
-  /// Convert number to Arabic-Indic numerals.
-  String _toArabicNumeral(int number) {
-    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    return number
-        .toString()
-        .split('')
-        .map((d) => arabicDigits[int.parse(d)])
-        .join();
-  }
 }

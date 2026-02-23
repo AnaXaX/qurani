@@ -97,10 +97,15 @@ class QuranRepository {
       int surahNumber, List<dynamic> ayahs) async {
     for (final ayah in ayahs) {
       final verseKey = (ayah['verse_key'] as String).split(':');
+      // text_uthmani may be absent when using uthmani_tajweed endpoint
+      final plainText = (ayah['text_uthmani'] as String?) ??
+          (ayah['text_uthmani_tajweed'] as String?)
+              ?.replaceAll(_htmlTagRegex, '') ??
+          '';
       await _db.into(_db.ayahs).insertOnConflictUpdate(AyahsCompanion(
         surahId: Value(surahNumber),
         ayahNumber: Value(int.parse(verseKey[1])),
-        textUthmani: Value(ayah['text_uthmani'] ?? ''),
+        textUthmani: Value(plainText),
         textUthmaniTajweed: Value(ayah['text_uthmani_tajweed']),
         juzNumber: Value(ayah['juz_number'] ?? 1),
         hizbQuarter: Value(ayah['hizb_number'] ?? 1),
@@ -133,10 +138,14 @@ class QuranRepository {
       final verses = response.data['verses'] as List;
       for (final ayah in verses) {
         final verseKey = (ayah['verse_key'] as String).split(':');
+        final plainText = (ayah['text_uthmani'] as String?) ??
+            (ayah['text_uthmani_tajweed'] as String?)
+                ?.replaceAll(_htmlTagRegex, '') ??
+            '';
         await _db.into(_db.ayahs).insertOnConflictUpdate(AyahsCompanion(
           surahId: Value(int.parse(verseKey[0])),
           ayahNumber: Value(int.parse(verseKey[1])),
-          textUthmani: Value(ayah['text_uthmani'] ?? ''),
+          textUthmani: Value(plainText),
           textUthmaniTajweed: Value(ayah['text_uthmani_tajweed']),
           juzNumber: Value(ayah['juz_number'] ?? 1),
           hizbQuarter: Value(ayah['hizb_number'] ?? 1),

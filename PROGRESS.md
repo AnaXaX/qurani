@@ -114,11 +114,15 @@
 - [x] `OnboardingScreen` - 5 pages (welcome, features, theme, preferences, get started)
 - [x] Onboarding wired into app.dart with SharedPreferences persistence
 - [x] `HifzSetupScreen` - Surah picker with search, range selection, popular presets
-- [x] `HifzScreen` - 3 difficulty levels (easy/medium/hard), progressive reveal, type challenge
+- [x] `HifzScreen` - 3 difficulty levels (easy/medium/hard), progressive reveal, type challenge, self-assessment rating
 - [x] `KhatmahScreen` - 4 plans (30/60/90/365 days), progress tracking, daily targets
 - [x] Reading preferences provider (font size, default translation, default reciter) with SharedPreferences
 - [x] Font size, translation, and reciter pickers in Settings screen
-- [x] Onboarding preferences page wired with live pickers
+- [x] Onboarding preferences page wired with live pickers (theme, font, translation, reciter, tajweed, numeral style)
+- [x] Numeral style preference (Arabic-Indic ١٢٣ vs Western 123) with provider + settings + onboarding
+- [x] Tajweed colors toggle in settings + onboarding (default off for simpler reading)
+- [x] App bar cleanup: consolidated options into 3-dot menus on reading + hifz screens
+- [x] Fixed duplicate ayah numbers in mushaf mode + stripped from card modes
 - [x] Ayah play button wired to AudioPlayerService (EveryAyah CDN)
 - [x] Download manager: DownloadService, DownloadsScreen, offline toggle on reciter detail
 - [x] Surah download with progress, batch download all, delete management
@@ -645,3 +649,45 @@ MIT License — free to use, modify, and distribute.
 - Azkar: triggers when all items in a category are counted
 - Du'as: triggers when all repeatable du'as in a category are done
 - Quiz: triggers on passing score (70%+) with 300ms delay
+
+## Session Work (Feb 23, 2026) — UX Polish + Preferences
+
+### Hifz Self-Assessment System
+- Replaced auto-correct with user self-rating: correct (✓) / wrong (✗) buttons after reveal
+- State now uses 3 Sets (`_revealedAyahs`, `_correctAyahs`, `_wrongAyahs`) instead of counters
+- Green/red score tracking in progress bar with icons
+- Colored card borders for rated ayahs (green = correct, red = wrong)
+- `_RatingButton` widget for consistent rating UI
+
+### App Bar Cleanup (3-Dot Menus)
+- **Reading screen**: Replaced 5 separate icon buttons with single `PopupMenuButton<String>` (3-dot menu)
+  - Grouped sections: Reading Mode, Font Size, divider, Tajweed toggle, Translation, Continuous Play
+  - Each item has icon + text label + checkmark for active state
+- **Hifz screen**: Same treatment — replaced 4 action icons with single 3-dot menu
+  - Items: Difficulty level, Tajweed toggle, Show All, Reset Progress
+- Added `_checkItem` and `_hifzCheckItem` helper methods for clean menu items
+
+### Default Reading Mode
+- Changed tajweed default from `true` to `false` (plain text by default, tajweed opt-in)
+
+### Split View Play Button
+- Added play/pause button to split reading mode (was missing, only translation mode had it)
+
+### Ayah Number Deduplication
+- API returns ayah text with embedded end-of-ayah marker (۝) + Arabic-Indic digits
+- **Translation/Split modes**: Strip trailing ayah numbers with regex (`_plainTextNoNumber()`) — redundant with card badge
+- **Mushaf mode**: Removed our manually-added duplicate `\u06DD` + numeral — API text already has numbers
+- Removed unused `_toArabicNumeral` method
+
+### Numeral Style Preference
+- Added `NumeralStyle` enum (arabic/western) + `NumeralStyleNotifier` + `numeralStyleProvider`
+- `formatAyahNumber()` helper: converts int to Arabic-Indic (١٢٣) or Western (123)
+- **Settings screen**: Added numeral style picker (bottom sheet with RadioListTile)
+- **Onboarding page 4**: Added numeral style toggle card (tap to switch between styles)
+- **Reading screen**: Wired into translation card badge + split mode number badge
+- **Hifz screen**: Wired into ayah number badge
+
+### Settings & Onboarding Updates
+- **Settings**: Added Tajweed Colors SwitchListTile + Ayah Numbers picker in "Quran Reading" section
+- **Onboarding**: Added `_ToggleCard` widget for tajweed + numeral style on preferences page
+- Wrapped preferences page content in `SingleChildScrollView` (more items now fit)

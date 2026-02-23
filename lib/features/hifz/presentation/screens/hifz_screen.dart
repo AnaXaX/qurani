@@ -2,8 +2,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/providers/reading_preferences_provider.dart';
+import '../../../audio/presentation/providers/audio_providers.dart';
 import '../../../quran/data/models/surah_info.dart';
 import '../../../quran/presentation/providers/quran_providers.dart';
+import '../../../quran/presentation/widgets/tajweed_text_widget.dart';
 
 /// Hifz (Memorization) mode screen.
 /// Progressively hides ayahs to test recall. User taps to reveal.
@@ -29,12 +32,23 @@ class HifzScreen extends ConsumerStatefulWidget {
 
 class _HifzScreenState extends ConsumerState<HifzScreen> {
   static final RegExp _diacriticsRegex = RegExp(r'[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]');
+  static final RegExp _htmlTagRegex = RegExp(r'<[^>]*>');
+
+  /// Get plain Arabic text, falling back to stripped tajweed HTML.
+  String _plainText(Ayah ayah) {
+    if (ayah.textUthmani.isNotEmpty) return ayah.textUthmani;
+    return ayah.textUthmaniTajweed?.replaceAll(_htmlTagRegex, '') ?? '';
+  }
 
   HifzDifficulty _difficulty = HifzDifficulty.easy;
-  final Set<int> _revealedAyahs = {};
+  final Set<int> _revealedAyahs = {};      // revealed but not yet rated
+  final Set<int> _correctAyahs = {};       // rated correct
+  final Set<int> _wrongAyahs = {};         // rated wrong
   bool _showAll = false;
-  int _correctCount = 0;
-  int _totalAttempts = 0;
+
+  bool _isRevealed(int ayahNumber) =>
+      _showAll || _revealedAyahs.contains(ayahNumber) ||
+      _correctAyahs.contains(ayahNumber) || _wrongAyahs.contains(ayahNumber);
 
   @override
   Widget build(BuildContext context) {
@@ -55,54 +69,40 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
           ],
         ),
         actions: [
-          // Difficulty selector
-          PopupMenuButton<HifzDifficulty>(
-            icon: const Icon(Icons.tune_rounded),
-            tooltip: 'Difficulty',
-            onSelected: (d) => setState(() {
-              _difficulty = d;
-              _revealedAyahs.clear();
-              _showAll = false;
-            }),
-            itemBuilder: (_) => HifzDifficulty.values
-                .map((d) => PopupMenuItem(
-                      value: d,
-                      child: Row(
-                        children: [
-                          Text(d.label),
-                          if (_difficulty == d) ...[
-                            const Spacer(),
-                            Icon(Icons.check,
-                                size: 18,
-                                color: Theme.of(context).colorScheme.primary),
-                          ],
-                        ],
-                      ),
-                    ))
-                .toList(),
-          ),
-          // Show/hide all toggle
-          IconButton(
-            icon: Icon(_showAll
-                ? Icons.visibility_off_rounded
-                : Icons.visibility_rounded),
-            tooltip: _showAll ? 'Hide all' : 'Show all',
-            onPressed: () => setState(() {
-              _showAll = !_showAll;
-              if (!_showAll) _revealedAyahs.clear();
-            }),
-          ),
-          // Reset
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Reset',
-            onPressed: () => setState(() {
-              _revealedAyahs.clear();
-              _showAll = false;
-              _correctCount = 0;
-              _totalAttempts = 0;
-            }),
-          ),
+          Consumer(builder: (context, ref, _) {
+            final showTajweed = ref.watch(tajweedProvider);
+            return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: 'Options',
+              onSelected: (value) {
+                switch (value) {
+                  case 'easy':
+                    setState(() { _difficulty = HifzDifficulty.easy; _revealedAyahs.clear(); _showAll = false; });
+                  case 'medium':
+                    setState(() { _difficulty = HifzDifficulty.medium; _revealedAyahs.clear(); _showAll = false; });
+                  case 'hard':
+                    setState(() { _difficulty = HifzDifficulty.hard; _revealedAyahs.clear(); _showAll = false; });
+                  case 'tajweed':
+                    ref.read(tajweedProvider.notifier).toggle();
+                  case 'show_all':
+                    setState(() { _showAll = !_showAll; if (!_showAll) _revealedAyahs.clear(); });
+                  case 'reset':
+                    setState(() { _revealedAyahs.clear(); _correctAyahs.clear(); _wrongAyahs.clear(); _showAll = false; });
+                }
+              },
+              itemBuilder: (_) => [
+                const PopupMenuItem(enabled: false, height: 32, child: Text('Difficulty', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600))),
+                _hifzCheckItem('easy', HifzDifficulty.easy.label, Icons.sentiment_satisfied_rounded, _difficulty == HifzDifficulty.easy),
+                _hifzCheckItem('medium', HifzDifficulty.medium.label, Icons.sentiment_neutral_rounded, _difficulty == HifzDifficulty.medium),
+                _hifzCheckItem('hard', HifzDifficulty.hard.label, Icons.sentiment_very_dissatisfied_rounded, _difficulty == HifzDifficulty.hard),
+                const PopupMenuDivider(),
+                _hifzCheckItem('tajweed', 'Tajweed Colors', Icons.color_lens_outlined, showTajweed),
+                _hifzCheckItem('show_all', _showAll ? 'Hide All Ayahs' : 'Show All Ayahs', _showAll ? Icons.visibility_off_rounded : Icons.visibility_rounded, _showAll),
+                const PopupMenuDivider(),
+                const PopupMenuItem(value: 'reset', child: Row(children: [Icon(Icons.refresh_rounded, size: 20), SizedBox(width: 12), Text('Reset Progress')])),
+              ],
+            );
+          }),
         ],
       ),
       body: ayahsAsync.when(
@@ -133,9 +133,7 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final ayah = filtered[index];
-                    final isRevealed =
-                        _showAll || _revealedAyahs.contains(ayah.ayahNumber);
-                    return _buildHifzCard(ayah, isRevealed);
+                    return _buildHifzCard(ayah, _isRevealed(ayah.ayahNumber));
                   },
                 ),
               ),
@@ -146,10 +144,30 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
     );
   }
 
+  PopupMenuItem<String> _hifzCheckItem(String value, String label, IconData icon, bool checked) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(width: 12),
+          Expanded(child: Text(label)),
+          if (checked)
+            Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.primary),
+        ],
+      ),
+    );
+  }
+
   Widget _buildProgressBar(List<Ayah> ayahs) {
     final total = ayahs.length;
-    final revealed = _showAll ? total : _revealedAyahs.length;
-    final progress = total > 0 ? revealed / total : 0.0;
+    final revealedCount = _showAll
+        ? total
+        : (_revealedAyahs.length + _correctAyahs.length + _wrongAyahs.length);
+    final progress = total > 0 ? revealedCount / total : 0.0;
+    final correctCount = _correctAyahs.length;
+    final wrongCount = _wrongAyahs.length;
+    final rated = correctCount + wrongCount;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -167,8 +185,30 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
                 ),
               ),
               const Spacer(),
+              if (rated > 0) ...[
+                Icon(Icons.check_circle, size: 14, color: Colors.green),
+                const SizedBox(width: 2),
+                Text(
+                  '$correctCount',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.cancel, size: 14, color: Colors.red),
+                const SizedBox(width: 2),
+                Text(
+                  '$wrongCount',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(width: 12),
+              ],
               Text(
-                '$revealed / $total ayahs revealed',
+                '$revealedCount / $total',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context)
                           .colorScheme
@@ -176,16 +216,6 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
                           .withAlpha(153),
                     ),
               ),
-              if (_totalAttempts > 0) ...[
-                const SizedBox(width: 12),
-                Text(
-                  '$_correctCount/$_totalAttempts correct',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -204,6 +234,22 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
   }
 
   Widget _buildHifzCard(Ayah ayah, bool isRevealed) {
+    final isCorrect = _correctAyahs.contains(ayah.ayahNumber);
+    final isWrong = _wrongAyahs.contains(ayah.ayahNumber);
+    final rated = isCorrect || isWrong;
+
+    // Border color: green if correct, red if wrong, default otherwise
+    Color borderColor;
+    if (isCorrect) {
+      borderColor = Colors.green.withAlpha(150);
+    } else if (isWrong) {
+      borderColor = Colors.red.withAlpha(150);
+    } else if (isRevealed) {
+      borderColor = Theme.of(context).colorScheme.outline.withAlpha(51);
+    } else {
+      borderColor = Theme.of(context).colorScheme.primary.withAlpha(77);
+    }
+
     return GestureDetector(
       onTap: isRevealed ? null : () => _revealAyah(ayah),
       child: AnimatedContainer(
@@ -211,38 +257,46 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isRevealed
-              ? Theme.of(context).colorScheme.surface
-              : Theme.of(context)
-                  .colorScheme
-                  .primaryContainer
-                  .withAlpha(51),
+          color: isCorrect
+              ? Colors.green.withAlpha(15)
+              : isWrong
+                  ? Colors.red.withAlpha(15)
+                  : isRevealed
+                      ? Theme.of(context).colorScheme.surface
+                      : Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withAlpha(51),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isRevealed
-                ? Theme.of(context).colorScheme.outline.withAlpha(51)
-                : Theme.of(context).colorScheme.primary.withAlpha(77),
-          ),
+          border: Border.all(color: borderColor, width: rated ? 1.5 : 1.0),
         ),
         child: Column(
           children: [
-            // Ayah number badge
+            // Ayah number badge + actions
             Row(
               children: [
                 Container(
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: isCorrect
+                        ? Colors.green.withAlpha(40)
+                        : isWrong
+                            ? Colors.red.withAlpha(40)
+                            : Theme.of(context).colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    '${ayah.ayahNumber}',
+                    formatAyahNumber(ayah.ayahNumber, ref.watch(numeralStyleProvider)),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: isCorrect
+                          ? Colors.green
+                          : isWrong
+                              ? Colors.red
+                              : Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
@@ -253,27 +307,58 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
                     size: 18,
                     color: Theme.of(context).colorScheme.primary.withAlpha(128),
                   ),
-                if (isRevealed)
-                  Icon(
-                    Icons.check_circle_rounded,
-                    size: 18,
-                    color: Colors.green.withAlpha(179),
+                if (isRevealed) ...[
+                  _PlayAyahButton(
+                    surahNumber: widget.surah.number,
+                    ayahNumber: ayah.ayahNumber,
+                    totalAyahs: widget.surah.ayahCount,
                   ),
+                  if (!rated) ...[
+                    // Self-assessment buttons (only before rating)
+                    const SizedBox(width: 8),
+                    _RatingButton(
+                      icon: Icons.check_circle_rounded,
+                      color: Colors.green,
+                      tooltip: 'I knew it',
+                      onTap: () => _rateAyah(ayah.ayahNumber, true),
+                    ),
+                    const SizedBox(width: 4),
+                    _RatingButton(
+                      icon: Icons.cancel_rounded,
+                      color: Colors.red,
+                      tooltip: 'I didn\'t know',
+                      onTap: () => _rateAyah(ayah.ayahNumber, false),
+                    ),
+                  ],
+                  if (rated) ...[
+                    const SizedBox(width: 8),
+                    Icon(
+                      isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                      size: 20,
+                      color: isCorrect ? Colors.green : Colors.red,
+                    ),
+                  ],
+                ],
               ],
             ),
             const SizedBox(height: 12),
             // Ayah content
             if (isRevealed)
-              Text(
-                ayah.textUthmani,
-                style: const TextStyle(
-                  fontFamily: 'AmiriQuran',
-                  fontSize: 26,
-                  height: 2.0,
-                ),
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.center,
-              )
+              (ref.watch(tajweedProvider) && ayah.textUthmaniTajweed != null)
+                  ? TajweedTextWidget(
+                      textUthmaniTajweed: ayah.textUthmaniTajweed!,
+                      fontSize: 26,
+                    )
+                  : Text(
+                      _plainText(ayah),
+                      style: const TextStyle(
+                        fontFamily: 'AmiriQuran',
+                        fontSize: 26,
+                        height: 2.0,
+                      ),
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.center,
+                    )
             else
               _buildHiddenContent(ayah),
           ],
@@ -286,7 +371,7 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
     switch (_difficulty) {
       case HifzDifficulty.easy:
         // Show first word, hide rest
-        final words = ayah.textUthmani.split(' ');
+        final words = _plainText(ayah).split(' ');
         final firstWord = words.isNotEmpty ? words.first : '';
         final hiddenCount = max(0, words.length - 1);
         return Column(
@@ -333,7 +418,7 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
 
       case HifzDifficulty.medium:
         // Fully hidden
-        final wordCount = ayah.textUthmani.split(' ').length;
+        final wordCount = _plainText(ayah).split(' ').length;
         return Column(
           children: [
             Text(
@@ -360,7 +445,7 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
 
       case HifzDifficulty.hard:
         // Must type first word to reveal
-        final words = ayah.textUthmani.split(' ');
+        final words = _plainText(ayah).split(' ');
         final wordCount = words.length;
         return Column(
           children: [
@@ -390,20 +475,30 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
 
   void _revealAyah(Ayah ayah) {
     if (_difficulty == HifzDifficulty.hard) {
-      // Show dialog to type first word
       _showTypeChallenge(ayah);
     } else {
       setState(() {
         _revealedAyahs.add(ayah.ayahNumber);
-        _totalAttempts++;
-        _correctCount++;
       });
     }
   }
 
+  void _rateAyah(int ayahNumber, bool correct) {
+    setState(() {
+      _revealedAyahs.remove(ayahNumber);
+      if (correct) {
+        _correctAyahs.add(ayahNumber);
+        _wrongAyahs.remove(ayahNumber);
+      } else {
+        _wrongAyahs.add(ayahNumber);
+        _correctAyahs.remove(ayahNumber);
+      }
+    });
+  }
+
   void _showTypeChallenge(Ayah ayah) {
     final controller = TextEditingController();
-    final firstWord = ayah.textUthmani.split(' ').first;
+    final firstWord = _plainText(ayah).split(' ').first;
 
     showDialog(
       context: context,
@@ -454,15 +549,12 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
   }
 
   void _checkAnswer(String typed, String correct, Ayah ayah) {
-    setState(() => _totalAttempts++);
-    // Normalize: remove diacritics for comparison
     final normalizedTyped = _removeDiacritics(typed);
     final normalizedCorrect = _removeDiacritics(correct);
 
     if (normalizedTyped == normalizedCorrect) {
       setState(() {
         _revealedAyahs.add(ayah.ayahNumber);
-        _correctCount++;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -472,9 +564,13 @@ class _HifzScreenState extends ConsumerState<HifzScreen> {
         ),
       );
     } else {
+      // Wrong answer in hard mode — still reveal so they can self-rate
+      setState(() {
+        _revealedAyahs.add(ayah.ayahNumber);
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Try again. The word was: $correct'),
+          content: Text('The word was: $correct'),
           backgroundColor: Colors.orange,
           duration: const Duration(seconds: 2),
         ),
@@ -495,4 +591,81 @@ enum HifzDifficulty {
 
   final String label;
   const HifzDifficulty(this.label);
+}
+
+class _RatingButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _RatingButton({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Tooltip(
+        message: tooltip,
+        child: Icon(icon, size: 26, color: color),
+      ),
+    );
+  }
+}
+
+class _PlayAyahButton extends ConsumerWidget {
+  final int surahNumber;
+  final int ayahNumber;
+  final int totalAyahs;
+
+  const _PlayAyahButton({
+    required this.surahNumber,
+    required this.ayahNumber,
+    required this.totalAyahs,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPlaying = ref.watch(
+      currentAudioStateProvider.select((s) => s.isPlaying),
+    );
+    final playingSurah = ref.watch(
+      currentAudioStateProvider.select((s) => s.currentSurah),
+    );
+    final playingAyah = ref.watch(
+      currentAudioStateProvider.select((s) => s.currentAyah),
+    );
+
+    final isThisPlaying =
+        isPlaying && playingSurah == surahNumber && playingAyah == ayahNumber;
+
+    return GestureDetector(
+      onTap: () {
+        final service = ref.read(audioPlayerServiceProvider);
+        if (isThisPlaying) {
+          service.pause();
+        } else {
+          final reciter = ref.read(defaultReciterProvider);
+          service.playAyah(
+            surahNumber: surahNumber,
+            ayahNumber: ayahNumber,
+            reciterFolder: reciter.id,
+            totalAyahs: totalAyahs,
+          );
+        }
+      },
+      child: Icon(
+        isThisPlaying ? Icons.pause_circle_rounded : Icons.volume_up_rounded,
+        size: 22,
+        color: isThisPlaying
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.onSurface.withAlpha(140),
+      ),
+    );
+  }
 }

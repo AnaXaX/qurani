@@ -27,8 +27,8 @@ class FeatureTile extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgAlpha = isDark ? 40 : 30;
     final iconColor = isDark ? color.withAlpha(220) : color;
-    final boxSize = compact ? 48.0 : 56.0;
-    final iconSize = compact ? 24.0 : 28.0;
+    final boxSize = compact ? 58.0 : 56.0;
+    final iconSize = compact ? 28.0 : 28.0;
 
     return InkWell(
       onTap: onTap,
