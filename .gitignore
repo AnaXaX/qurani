@@ -1,6 +1,9 @@
 # Claude Code
 .claude/
 
+# Store listing (private, not for repo)
+STORE_LISTING.md
+
 # VS Code
 .vscode/
 
