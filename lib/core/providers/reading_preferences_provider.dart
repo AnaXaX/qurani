@@ -254,14 +254,14 @@ final startupScreenProvider =
 });
 
 class StartupScreenNotifier extends StateNotifier<StartupScreen> {
-  StartupScreenNotifier() : super(StartupScreen.lastPosition) {
+  StartupScreenNotifier() : super(StartupScreen.home) {
     _load();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString(_startupScreenKey);
-    if (value == 'home') state = StartupScreen.home;
+    if (value == 'lastPosition') state = StartupScreen.lastPosition;
   }
 
   Future<void> setStartupScreen(StartupScreen screen) async {

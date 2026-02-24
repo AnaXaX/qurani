@@ -567,18 +567,6 @@ class _PreferencesPage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<StartupScreen>(
-              value: StartupScreen.lastPosition,
-              groupValue: current,
-              title: const Text('Last Reading Position'),
-              subtitle: const Text('Continue right where you left off'),
-              onChanged: (_) {
-                ref
-                    .read(startupScreenProvider.notifier)
-                    .setStartupScreen(StartupScreen.lastPosition);
-                Navigator.pop(sheetContext);
-              },
-            ),
-            RadioListTile<StartupScreen>(
               value: StartupScreen.home,
               groupValue: current,
               title: const Text('Home Screen'),
@@ -587,6 +575,18 @@ class _PreferencesPage extends ConsumerWidget {
                 ref
                     .read(startupScreenProvider.notifier)
                     .setStartupScreen(StartupScreen.home);
+                Navigator.pop(sheetContext);
+              },
+            ),
+            RadioListTile<StartupScreen>(
+              value: StartupScreen.lastPosition,
+              groupValue: current,
+              title: const Text('Last Reading Position'),
+              subtitle: const Text('Continue right where you left off'),
+              onChanged: (_) {
+                ref
+                    .read(startupScreenProvider.notifier)
+                    .setStartupScreen(StartupScreen.lastPosition);
                 Navigator.pop(sheetContext);
               },
             ),

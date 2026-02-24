@@ -500,10 +500,10 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             RadioListTile<StartupScreen>(
-              value: StartupScreen.lastPosition,
+              value: StartupScreen.home,
               groupValue: current,
-              title: const Text('Last Reading Position'),
-              subtitle: const Text('Continue right where you left off'),
+              title: const Text('Home Screen'),
+              subtitle: const Text('Always open to the dashboard'),
               onChanged: (value) {
                 if (value != null) {
                   ref
@@ -514,10 +514,10 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
             RadioListTile<StartupScreen>(
-              value: StartupScreen.home,
+              value: StartupScreen.lastPosition,
               groupValue: current,
-              title: const Text('Home Screen'),
-              subtitle: const Text('Always open to the dashboard'),
+              title: const Text('Last Reading Position'),
+              subtitle: const Text('Continue right where you left off'),
               onChanged: (value) {
                 if (value != null) {
                   ref
