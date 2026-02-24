@@ -9,7 +9,7 @@ import '../../features/settings/presentation/screens/more_screen.dart';
 import 'route_names.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
-final _quranNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'quran');
+final quranNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'quran');
 final _listenNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'listen');
 final _homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
 final _bookmarksNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'bookmarks');
@@ -26,7 +26,7 @@ final appRouter = GoRouter(
       branches: [
         // Tab 1: Quran
         StatefulShellBranch(
-          navigatorKey: _quranNavigatorKey,
+          navigatorKey: quranNavigatorKey,
           routes: [
             GoRoute(
               path: RouteNames.quran,

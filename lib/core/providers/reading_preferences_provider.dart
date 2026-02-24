@@ -56,7 +56,7 @@ final defaultTranslationProvider =
 });
 
 class DefaultTranslationNotifier extends StateNotifier<TranslationOption> {
-  DefaultTranslationNotifier() : super(translationOptions[1]) {
+  DefaultTranslationNotifier() : super(translationOptions[0]) {
     _load();
   }
 
@@ -254,14 +254,14 @@ final startupScreenProvider =
 });
 
 class StartupScreenNotifier extends StateNotifier<StartupScreen> {
-  StartupScreenNotifier() : super(StartupScreen.home) {
+  StartupScreenNotifier() : super(StartupScreen.lastPosition) {
     _load();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString(_startupScreenKey);
-    if (value == 'lastPosition') state = StartupScreen.lastPosition;
+    if (value == 'home') state = StartupScreen.home;
   }
 
   Future<void> setStartupScreen(StartupScreen screen) async {

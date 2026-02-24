@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/router/app_router.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../quran/data/models/surah_info.dart';
 import '../../../quran/presentation/screens/reading_screen.dart';
 import '../providers/bookmark_providers.dart';
 
-class BookmarksScreen extends ConsumerWidget {
+class BookmarksScreen extends ConsumerStatefulWidget {
   const BookmarksScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BookmarksScreen> createState() => _BookmarksScreenState();
+}
+
+class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
+  List<AyahBookmark> _bookmarks = [];
+
+  @override
+  Widget build(BuildContext context) {
     final bookmarksAsync = ref.watch(bookmarksProvider);
+
+    // Sync local list when provider data arrives
+    bookmarksAsync.whenData((data) {
+      if (!_listEquals(_bookmarks, data)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _bookmarks = List.from(data));
+        });
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -22,21 +41,40 @@ class BookmarksScreen extends ConsumerWidget {
         error: (error, _) => Center(
           child: Text('Error loading bookmarks: $error'),
         ),
-        data: (bookmarks) {
-          if (bookmarks.isEmpty) {
+        data: (_) {
+          if (_bookmarks.isEmpty) {
             return _buildEmptyState(context);
           }
           return ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: bookmarks.length,
+            itemCount: _bookmarks.length,
             itemBuilder: (context, index) {
-              final bookmark = bookmarks[index];
-              return _BookmarkTile(bookmark: bookmark);
+              final bookmark = _bookmarks[index];
+              return _BookmarkTile(
+                bookmark: bookmark,
+                onDismissed: () {
+                  setState(() => _bookmarks.removeAt(index));
+                  ref.read(bookmarkRepositoryProvider).removeBookmark(
+                        surahId: bookmark.surahId,
+                        ayahNumber: bookmark.ayahNumber,
+                      );
+                  ref.invalidate(bookmarksProvider);
+                },
+              );
             },
           );
         },
       ),
     );
+  }
+
+  bool _listEquals(List<AyahBookmark> a, List<AyahBookmark> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].surahId != b[i].surahId ||
+          a[i].ayahNumber != b[i].ayahNumber) return false;
+    }
+    return true;
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -81,8 +119,9 @@ class BookmarksScreen extends ConsumerWidget {
 
 class _BookmarkTile extends ConsumerWidget {
   final AyahBookmark bookmark;
+  final VoidCallback onDismissed;
 
-  const _BookmarkTile({required this.bookmark});
+  const _BookmarkTile({required this.bookmark, required this.onDismissed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -107,11 +146,7 @@ class _BookmarkTile extends ConsumerWidget {
       ),
       onDismissed: (_) {
         HapticFeedback.lightImpact();
-        ref.read(bookmarkRepositoryProvider).removeBookmark(
-              surahId: bookmark.surahId,
-              ayahNumber: bookmark.ayahNumber,
-            );
-        ref.invalidate(bookmarksProvider);
+        onDismissed();
       },
       child: ListTile(
         contentPadding:
@@ -150,15 +185,18 @@ class _BookmarkTile extends ConsumerWidget {
           textDirection: TextDirection.rtl,
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ReadingScreen(
-                surah: surah,
-                initialAyah: bookmark.ayahNumber,
+          // Switch to Quran tab, then push ReadingScreen there
+          context.go(RouteNames.quran);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            quranNavigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (_) => ReadingScreen(
+                  surah: surah,
+                  initialAyah: bookmark.ayahNumber,
+                ),
               ),
-            ),
-          );
+            );
+          });
         },
       ),
     );

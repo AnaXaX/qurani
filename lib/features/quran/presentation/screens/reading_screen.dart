@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/providers/reading_preferences_provider.dart';
 import '../../../audio/presentation/providers/audio_providers.dart';
@@ -46,19 +47,19 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
   Timer? _saveDebounce;
 
   // Controllers
-  final ScrollController _scrollController = ScrollController();
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
   PageController? _pageController;
 
   // Audio auto-scroll state
   bool _userIsScrolling = false;
+  Timer? _userScrollTimer;
 
   // Cached ayah data for synchronization
   List<Ayah>? _loadedAyahs;
   Map<int, List<Ayah>>? _pageMap;
   List<int>? _pageNumbers;
-
-  /// Estimated height per ayah card in recitation mode (card + margin).
-  static const double _estimatedCardHeight = 200.0;
 
   String _plainText(Ayah ayah) {
     if (ayah.textUthmani.isNotEmpty) return ayah.textUthmani;
@@ -93,16 +94,16 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
       _saveCurrentPosition();
     });
 
-    // Listen for scroll events (recitation mode position tracking)
-    _scrollController.addListener(_onScroll);
+    // Listen for visible item changes (recitation mode position tracking)
+    _itemPositionsListener.itemPositions.addListener(_onPositionsChanged);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _saveDebounce?.cancel();
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _userScrollTimer?.cancel();
+    _itemPositionsListener.itemPositions.removeListener(_onPositionsChanged);
     _pageController?.dispose();
     super.dispose();
   }
@@ -140,16 +141,20 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
 
   // ─── Scroll Tracking (Recitation Mode) ───
 
-  void _onScroll() {
+  void _onPositionsChanged() {
     if (_loadedAyahs == null || _loadedAyahs!.isEmpty) return;
 
-    // Estimate visible ayah from scroll offset
-    // index 0 = header (~200px), then each card is ~_estimatedCardHeight
-    final offset = _scrollController.offset;
-    final headerHeight = 200.0; // approximate surah header height
-    final adjustedOffset = (offset - headerHeight).clamp(0.0, double.infinity);
-    final estimatedIndex = (adjustedOffset / _estimatedCardHeight).floor();
-    final ayahIndex = estimatedIndex.clamp(0, _loadedAyahs!.length - 1);
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    // Find the first visible ayah item (index > 0, since index 0 = header)
+    final ayahPositions = positions.where((p) => p.index > 0).toList()
+      ..sort((a, b) => a.index.compareTo(b.index));
+
+    if (ayahPositions.isEmpty) return;
+
+    final firstVisible = ayahPositions.first;
+    final ayahIndex = (firstVisible.index - 1).clamp(0, _loadedAyahs!.length - 1);
     final newAyah = _loadedAyahs![ayahIndex].ayahNumber;
 
     if (newAyah != _currentAyah) {
@@ -175,12 +180,8 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
       _mode = newMode;
     });
 
-    if (newMode == ReadingMode.recitation) {
-      // Mushaf → Recitation: scroll to current ayah after frame
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToAyah(_currentAyah, animate: false);
-      });
-    }
+    // When switching to recitation, ScrollablePositionedList rebuilds
+    // with initialScrollIndex: _currentAyah, so no manual scroll needed.
 
     ref.read(readingModeProvider.notifier).setMode(newMode);
   }
@@ -205,22 +206,16 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
   }
 
   void _scrollToAyah(int ayahNumber, {bool animate = true}) {
-    if (!_scrollController.hasClients) return;
-    // index in ListView = ayahNumber (since index 0 = header)
-    final targetOffset =
-        200.0 + ((ayahNumber - 1) * _estimatedCardHeight);
-    final clampedOffset = targetOffset.clamp(
-      0.0,
-      _scrollController.position.maxScrollExtent,
-    );
+    if (!_itemScrollController.isAttached) return;
+    // index 0 = header, so ayahNumber maps directly to item index
     if (animate) {
-      _scrollController.animateTo(
-        clampedOffset,
+      _itemScrollController.scrollTo(
+        index: ayahNumber,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      _scrollController.jumpTo(clampedOffset);
+      _itemScrollController.jumpTo(index: ayahNumber);
     }
   }
 
@@ -604,18 +599,22 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
       translationMap[t.ayahNumber] = t;
     }
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        if (notification is ScrollStartNotification) {
-          _userIsScrolling = true;
-        } else if (notification is ScrollEndNotification) {
-          _userIsScrolling = false;
-        }
-        return false;
+    return Listener(
+      onPointerDown: (_) {
+        _userIsScrolling = true;
+        _userScrollTimer?.cancel();
       },
-      child: ListView.builder(
-        controller: _scrollController,
-        cacheExtent: 800,
+      onPointerUp: (_) {
+        // Re-enable auto-scroll after user stops touching for 3 seconds
+        _userScrollTimer?.cancel();
+        _userScrollTimer = Timer(const Duration(seconds: 3), () {
+          _userIsScrolling = false;
+        });
+      },
+      child: ScrollablePositionedList.builder(
+        itemScrollController: _itemScrollController,
+        itemPositionsListener: _itemPositionsListener,
+        initialScrollIndex: _currentAyah > 1 ? _currentAyah : 0,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: ayahs.length + 1,
         itemBuilder: (context, index) {

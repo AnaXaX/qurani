@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../quran/data/models/surah_info.dart';
+import '../../../quran/presentation/screens/reading_screen.dart';
 import '../../data/services/audio_player_service.dart';
 import '../providers/audio_providers.dart';
 
@@ -48,60 +49,75 @@ class FullPlayerScreen extends ConsumerWidget {
         child: Column(
           children: [
             const Spacer(flex: 2),
-            // Surah artwork / icon
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Theme.of(context).colorScheme.primary,
-                    Theme.of(context).colorScheme.primary.withAlpha(179),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withAlpha(77),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+            // Surah artwork / icon — tap to open reading screen
+            GestureDetector(
+              onTap: surah != null
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ReadingScreen(
+                            surah: surah,
+                            initialAyah: currentAyah ?? 1,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withAlpha(179),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (surah != null) ...[
-                    Text(
-                      surah.nameArabic,
-                      style: TextStyle(
-                        fontFamily: 'AmiriQuran',
-                        fontSize: 36,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      textDirection: TextDirection.rtl,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withAlpha(77),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      currentAyah != null
-                          ? 'Ayah $currentAyah'
-                          : 'Surah ${surah.number}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onPrimary
-                            .withAlpha(179),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (surah != null) ...[
+                      Text(
+                        surah.nameArabic,
+                        style: TextStyle(
+                          fontFamily: 'AmiriQuran',
+                          fontSize: 36,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                        textDirection: TextDirection.rtl,
                       ),
-                    ),
-                  ] else
-                    Icon(Icons.music_note,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        semanticLabel: 'No track loaded'),
-                ],
+                      const SizedBox(height: 8),
+                      Text(
+                        currentAyah != null
+                            ? 'Ayah $currentAyah'
+                            : 'Surah ${surah.number}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withAlpha(179),
+                        ),
+                      ),
+                    ] else
+                      Icon(Icons.music_note,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          semanticLabel: 'No track loaded'),
+                  ],
+                ),
               ),
             ),
             const Spacer(),

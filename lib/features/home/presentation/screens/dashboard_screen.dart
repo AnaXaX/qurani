@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/hijri_utils.dart';
 import '../../../../core/utils/page_transitions.dart';
@@ -159,8 +160,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           // ── Gradient Header with parallax ──
           GradientHeader(
-            gradient:
-                isDark ? AppColors.gradientSkyDark : AppColors.gradientSky,
+            gradient: AppColors.getDailyHeaderGradient(isDark),
             height: 200,
             showMosque: true,
             scrollOffset: _scrollOffset,
@@ -177,11 +177,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Qurani',
+                      gregorianToHijri(DateTime.now()).formatCompact(),
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withAlpha(230),
+                        fontSize: 13,
+                        color: Colors.white.withAlpha(200),
                       ),
                     ),
                     Text(
@@ -194,17 +193,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       textDirection: TextDirection.rtl,
                     ),
                   ],
-                ),
-                const SizedBox(height: 4),
-                // Hijri date
-                Center(
-                  child: Text(
-                    gregorianToHijri(DateTime.now()).formatCompact(),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withAlpha(180),
-                    ),
-                  ),
                 ),
                 const Spacer(),
                 Center(
@@ -273,15 +261,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       surah: surah,
                       ayahNumber: position.ayahNumber,
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          SlideUpRoute(
-                            page: ReadingScreen(
-                              surah: surah,
-                              initialAyah: position.ayahNumber,
+                        // Switch to Quran tab, then push ReadingScreen there
+                        context.go(RouteNames.quran);
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          quranNavigatorKey.currentState?.push(
+                            MaterialPageRoute(
+                              builder: (_) => ReadingScreen(
+                                surah: surah,
+                                initialAyah: position.ayahNumber,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        });
                       },
                     );
                   },
@@ -372,7 +363,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                     ),
                     FeatureTile(
-                      icon: Icons.menu_book_rounded,
+                      icon: Icons.psychology_rounded,
                       label: 'Hifz',
                       color: AppColors.accentHifz,
                       compact: true,
@@ -620,11 +611,14 @@ class _AchievementsPreview extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Achievements',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                GestureDetector(
+                  onTap: () => Navigator.push(context, SlideUpRoute(page: const AchievementsScreen())),
+                  child: Text(
+                    'Achievements',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.push(context, SlideUpRoute(page: const AchievementsScreen())),
@@ -643,28 +637,31 @@ class _AchievementsPreview extends ConsumerWidget {
                 final def = AchievementDef.getById(achievement.achievementId);
                 if (def == null) return const SizedBox.shrink();
                 return Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: def.color.withAlpha(30),
-                          shape: BoxShape.circle,
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, SlideUpRoute(page: const AchievementsScreen())),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: def.color.withAlpha(30),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(def.icon, color: def.color, size: 22),
                         ),
-                        child: Icon(def.icon, color: def.color, size: 22),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        def.title,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              fontSize: 9,
-                            ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          def.title,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                fontSize: 9,
+                              ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),

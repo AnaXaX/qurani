@@ -1027,3 +1027,41 @@ Widget infrastructure:
 ### Git Commits (this session)
 42. `276df83` - Fix notification icons, add widget tap-to-open, and Hijri screen improvements
 43. `0e6e459` - Replace notification icon PNGs with XML vector, fix donation links
+
+## Session Work (Feb 24, 2026) — Scroll Fix, Mini Player Upgrade & UX Defaults
+
+### Critical Scroll Fix (ReadingScreen)
+- Replaced broken `ScrollController` + `_estimatedCardHeight = 200.0` with `scrollable_positioned_list` package
+- `ScrollablePositionedList.builder` + `ItemScrollController` + `ItemPositionsListener` — index-based scrolling eliminates height estimation
+- New `_onPositionsChanged()` tracks visible ayah by item index (replaces unreliable offset-based calculation)
+- `Listener` widget for pointer-based touch detection (replaces unreliable `ScrollNotification` for user vs programmatic scroll detection)
+- 3-second cooldown timer after user lifts finger before auto-scroll resumes
+- Bookmark navigation, audio follow, and mode switching all use `_itemScrollController.scrollTo(index:)` now
+
+### Mini Player Upgrade
+- Layout: `[surah+reciter] ... [mode chip] [prev] [play] [next] [close]`
+- Added skip previous/next buttons calling `service.skipPrevious()` / `service.skipNext()`
+- Added `_ModeChip` widget: cycles Single → Continuous → Repeat Surah → Repeat Ayah with snackbar feedback
+- Surah/reciter area taps to open full player (GestureDetector)
+- Thin progress line at top with rounded corners
+
+### Full Player Navigation
+- Tapping green surah artwork container navigates to ReadingScreen at the current playing ayah
+
+### UX Defaults for Fresh Install
+- Default startup changed from "Home Screen" to "Last Reading Position"
+- Default translation changed from "Saheeh International (English)" to "None"
+- Reordered radio buttons in Settings and Onboarding (Last Reading Position first)
+
+### Files Modified (10)
+- `lib/features/quran/presentation/screens/reading_screen.dart` — ScrollablePositionedList refactor
+- `lib/features/audio/presentation/widgets/mini_player_widget.dart` — complete rewrite with controls
+- `lib/features/audio/presentation/screens/full_player_screen.dart` — tap artwork to navigate
+- `lib/core/providers/reading_preferences_provider.dart` — default startup + translation changes
+- `lib/features/settings/presentation/screens/settings_screen.dart` — reordered startup picker
+- `lib/features/onboarding/presentation/screens/onboarding_screen.dart` — reordered startup picker
+- `lib/core/constants/app_colors.dart` — color palette updates
+- `lib/core/router/app_router.dart` — routing adjustments
+- `lib/features/bookmarks/presentation/screens/bookmarks_screen.dart` — bookmark navigation fix
+- `lib/features/home/presentation/screens/dashboard_screen.dart` — dashboard adjustments
+- `pubspec.yaml` — added scrollable_positioned_list: ^0.3.8
