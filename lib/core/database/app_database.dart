@@ -140,6 +140,55 @@ class RecordingSessions extends Table {
   IntColumn get selfRating => integer().nullable()();
 }
 
+// ─── Hadith Cache ───
+
+class CachedHadithSections extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get collectionKey => text()();
+  IntColumn get sectionNumber => integer()();
+  TextColumn get name => text()();
+  TextColumn get nameArabic => text().withDefault(const Constant(''))();
+  IntColumn get hadithStartNumber =>
+      integer().withDefault(const Constant(0))();
+  IntColumn get hadithEndNumber => integer().withDefault(const Constant(0))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {collectionKey, sectionNumber}
+      ];
+}
+
+class CachedHadiths extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get collectionKey => text()();
+  IntColumn get sectionNumber => integer()();
+  IntColumn get hadithNumber => integer()();
+  TextColumn get textArabic => text()();
+  TextColumn get textEnglish => text().withDefault(const Constant(''))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {collectionKey, hadithNumber}
+      ];
+}
+
+// ─── Azkar & Du'as Cache ───
+
+class CachedAzkar extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get categoryId => integer()();
+  TextColumn get categoryTitle => text()();
+  IntColumn get itemId => integer()();
+  TextColumn get arabicText => text()();
+  IntColumn get repeatCount => integer().withDefault(const Constant(1))();
+  TextColumn get audioUrl => text().withDefault(const Constant(''))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {categoryId, itemId}
+      ];
+}
+
 // ─── Database ───
 
 @DriftDatabase(tables: [
@@ -155,12 +204,15 @@ class RecordingSessions extends Table {
   Achievements,
   RecordingSessions,
   DailyActivityLog,
+  CachedHadithSections,
+  CachedHadiths,
+  CachedAzkar,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -168,6 +220,11 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(dailyActivityLog);
+          }
+          if (from < 3) {
+            await m.createTable(cachedHadithSections);
+            await m.createTable(cachedHadiths);
+            await m.createTable(cachedAzkar);
           }
         },
       );
@@ -277,6 +334,31 @@ class AppDatabase extends _$AppDatabase {
     final all = await select(downloadedAudio).get();
     return all.fold<int>(0, (sum, d) => sum + d.fileSize);
   }
+
+  // ─── Hadith Cache Queries ───
+
+  Future<List<CachedHadithSection>> getHadithSections(String collectionKey) =>
+      (select(cachedHadithSections)
+            ..where((s) => s.collectionKey.equals(collectionKey))
+            ..orderBy([(s) => OrderingTerm.asc(s.sectionNumber)]))
+          .get();
+
+  Future<List<CachedHadith>> getHadithsForSection(
+          String collectionKey, int sectionNumber) =>
+      (select(cachedHadiths)
+            ..where((h) =>
+                h.collectionKey.equals(collectionKey) &
+                h.sectionNumber.equals(sectionNumber))
+            ..orderBy([(h) => OrderingTerm.asc(h.hadithNumber)]))
+          .get();
+
+  // ─── Azkar Cache Queries ───
+
+  Future<List<CachedAzkarData>> getAzkarForCategory(int categoryId) =>
+      (select(cachedAzkar)
+            ..where((a) => a.categoryId.equals(categoryId))
+            ..orderBy([(a) => OrderingTerm.asc(a.itemId)]))
+          .get();
 }
 
 LazyDatabase _openConnection() {

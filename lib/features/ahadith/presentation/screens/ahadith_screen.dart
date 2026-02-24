@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/gradient_header.dart';
-import '../../data/ahadith_data.dart';
+import '../../data/services/hadith_api_service.dart';
 import 'hadith_collection_screen.dart';
 
 class AhadithScreen extends StatelessWidget {
@@ -55,7 +55,7 @@ class AhadithScreen extends StatelessWidget {
                   textDirection: TextDirection.rtl,
                 ),
                 Text(
-                  '${hadithCollections.length} collections',
+                  '${hadithCollections.length} collections • 40,000+ hadiths',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.white.withAlpha(160),

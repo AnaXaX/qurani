@@ -19,6 +19,13 @@ class ApiEndpoints {
 
   // Tafsir: QuranHub
   static const String quranHub = 'https://api.quranhub.com';
+
+  // Hadith: Fawaz Ahmed Hadith API (CDN, no key, no rate limits)
+  static const String hadithApi =
+      'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1';
+
+  // Azkar & Du'as: HisnMuslim API (no key)
+  static const String hisnMuslim = 'https://www.hisnmuslim.com';
 }
 
 /// Creates configured Dio instances for each API.
@@ -27,6 +34,8 @@ class ApiClient {
   late final Dio alQuranCloudDio;
   late final Dio mp3QuranDio;
   late final Dio quranHubDio;
+  late final Dio hadithApiDio;
+  late final Dio hisnMuslimDio;
 
   final CacheOptions _cacheOptions;
 
@@ -40,6 +49,8 @@ class ApiClient {
     alQuranCloudDio = _createDio(ApiEndpoints.alQuranCloud);
     mp3QuranDio = _createDio(ApiEndpoints.mp3Quran);
     quranHubDio = _createDio(ApiEndpoints.quranHub);
+    hadithApiDio = _createDio(ApiEndpoints.hadithApi);
+    hisnMuslimDio = _createDio(ApiEndpoints.hisnMuslim);
   }
 
   Dio _createDio(String baseUrl) {

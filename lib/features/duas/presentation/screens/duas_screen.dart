@@ -1,24 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/gradient_header.dart';
-import '../../data/duas_data.dart';
+import '../providers/duas_providers.dart';
 import 'dua_list_screen.dart';
-
-/// Icon mapping for dua categories.
-const _categoryIcons = <String, IconData>{
-  'morning': Icons.wb_sunny_rounded,
-  'evening': Icons.nightlight_round,
-  'sleep': Icons.bedtime_rounded,
-  'waking': Icons.alarm_rounded,
-  'mosque': Icons.mosque_rounded,
-  'eating': Icons.restaurant_rounded,
-  'travel': Icons.flight_rounded,
-  'rain': Icons.water_drop_rounded,
-  'healing': Icons.healing_rounded,
-  'forgiveness': Icons.favorite_rounded,
-  'parents': Icons.family_restroom_rounded,
-  'difficulty': Icons.support_rounded,
-};
 
 class DuasScreen extends StatelessWidget {
   const DuasScreen({super.key});
@@ -70,7 +54,7 @@ class DuasScreen extends StatelessWidget {
                   textDirection: TextDirection.rtl,
                 ),
                 Text(
-                  '${duaCategories.length} categories',
+                  '${duaCategoryList.length} categories',
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.white.withAlpha(160),
@@ -83,10 +67,9 @@ class DuasScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: duaCategories.length,
+            itemCount: duaCategoryList.length,
             itemBuilder: (context, index) {
-              final category = duaCategories[index];
-              final icon = _categoryIcons[category.icon] ?? Icons.star_rounded;
+              final category = duaCategoryList[index];
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -99,7 +82,7 @@ class DuasScreen extends StatelessWidget {
                       color: AppColors.accentDua.withAlpha(26),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: AppColors.accentDua),
+                    child: Icon(category.icon, color: AppColors.accentDua),
                   ),
                   title: Text(
                     category.title,
@@ -111,27 +94,16 @@ class DuasScreen extends StatelessWidget {
                         fontFamily: 'AmiriQuran', fontSize: 16),
                     textDirection: TextDirection.rtl,
                   ),
-                  trailing: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.accentDua.withAlpha(20),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${category.duas.length}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.accentDua,
-                      ),
-                    ),
-                  ),
+                  trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            DuaListScreen(category: category),
+                        builder: (_) => DuaListScreen(
+                          categoryId: category.categoryId,
+                          categoryTitle: category.titleArabic,
+                          displayTitle: category.title,
+                        ),
                       ),
                     );
                   },

@@ -5,76 +5,126 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/celebration_overlay.dart';
 import '../../../gamification/data/models/daily_goal.dart';
 import '../../../gamification/presentation/providers/gamification_providers.dart';
-import '../../data/models/dua.dart';
+import '../providers/duas_providers.dart';
 
 class DuaListScreen extends ConsumerStatefulWidget {
-  final DuaCategory category;
+  final int categoryId;
+  final String categoryTitle;
+  final String displayTitle;
 
-  const DuaListScreen({super.key, required this.category});
+  const DuaListScreen({
+    super.key,
+    required this.categoryId,
+    required this.categoryTitle,
+    required this.displayTitle,
+  });
 
   @override
   ConsumerState<DuaListScreen> createState() => _DuaListScreenState();
 }
 
 class _DuaListScreenState extends ConsumerState<DuaListScreen> {
-  late List<int> _counters;
-
-  @override
-  void initState() {
-    super.initState();
-    _counters = List.filled(widget.category.duas.length, 0);
-  }
+  final Map<int, int> _counters = {};
 
   @override
   Widget build(BuildContext context) {
+    final duasAsync = ref.watch(duasListProvider((
+      categoryId: widget.categoryId,
+      categoryTitle: widget.categoryTitle,
+    )));
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.category.title),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: widget.category.duas.length,
-        itemBuilder: (context, index) {
-          final dua = widget.category.duas[index];
-          return _DuaCard(
-            dua: dua,
-            index: index + 1,
-            counter: _counters[index],
-            onTap: () {
-              if (dua.repeatCount > 1) {
-                if (_counters[index] < dua.repeatCount) {
-                  setState(() {
-                    _counters[index]++;
-                    HapticFeedback.lightImpact();
-                  });
-                  // Check if all countable du'as are complete
-                  if (_counters[index] >= dua.repeatCount) {
-                    final allComplete = List.generate(
-                      widget.category.duas.length,
-                      (i) {
-                        final d = widget.category.duas[i];
-                        return d.repeatCount <= 1 || _counters[i] >= d.repeatCount;
-                      },
-                    ).every((c) => c);
-                    if (allComplete) {
-                      CelebrationOverlay.show(context, color: AppColors.accentDua);
-                      ref.read(gamificationServiceProvider).recordActivity(ActivityType.makeDua);
+      appBar: AppBar(title: Text(widget.displayTitle)),
+      body: duasAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.cloud_off_rounded,
+                    size: 48,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withAlpha(100)),
+                const SizedBox(height: 16),
+                Text(
+                  "Could not load du'as.\nCheck your internet connection.",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(160),
+                      ),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => ref.invalidate(duasListProvider((
+                    categoryId: widget.categoryId,
+                    categoryTitle: widget.categoryTitle,
+                  ))),
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (duasList) {
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: duasList.length,
+            itemBuilder: (context, index) {
+              final dua = duasList[index];
+              final count = _counters[index] ?? 0;
+              final isCompleted =
+                  dua.repeatCount > 1 && count >= dua.repeatCount;
+
+              return _DuaCard(
+                dua: dua,
+                index: index + 1,
+                counter: count,
+                isCompleted: isCompleted,
+                onTap: () {
+                  if (dua.repeatCount > 1 && count < dua.repeatCount) {
+                    setState(() {
+                      _counters[index] = count + 1;
+                      HapticFeedback.lightImpact();
+                    });
+                    if ((_counters[index] ?? 0) >= dua.repeatCount) {
+                      final allComplete = List.generate(
+                        duasList.length,
+                        (i) {
+                          final d = duasList[i];
+                          return d.repeatCount <= 1 ||
+                              (_counters[i] ?? 0) >= d.repeatCount;
+                        },
+                      ).every((c) => c);
+                      if (allComplete) {
+                        CelebrationOverlay.show(context,
+                            color: AppColors.accentDua);
+                        ref
+                            .read(gamificationServiceProvider)
+                            .recordActivity(ActivityType.makeDua);
+                      }
                     }
                   }
-                }
-              }
-            },
-            onCopy: () {
-              Clipboard.setData(ClipboardData(
-                text: '${dua.arabic}\n\n${dua.transliteration}\n\n${dua.translation}\n\n— ${dua.reference}',
-              ));
-              ScaffoldMessenger.of(context)
-                ..clearSnackBars()
-                ..showSnackBar(const SnackBar(
-                  content: Text('Du\'a copied'),
-                  duration: Duration(seconds: 1),
-                  behavior: SnackBarBehavior.floating,
-                ));
+                },
+                onCopy: () {
+                  Clipboard.setData(
+                      ClipboardData(text: dua.arabicText));
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(const SnackBar(
+                      content: Text("Du'a copied"),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ));
+                },
+              );
             },
           );
         },
@@ -84,9 +134,10 @@ class _DuaListScreenState extends ConsumerState<DuaListScreen> {
 }
 
 class _DuaCard extends StatelessWidget {
-  final Dua dua;
+  final dynamic dua;
   final int index;
   final int counter;
+  final bool isCompleted;
   final VoidCallback onTap;
   final VoidCallback onCopy;
 
@@ -94,14 +145,13 @@ class _DuaCard extends StatelessWidget {
     required this.dua,
     required this.index,
     required this.counter,
+    required this.isCompleted,
     required this.onTap,
     required this.onCopy,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = dua.repeatCount > 1 && counter >= dua.repeatCount;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -185,7 +235,7 @@ class _DuaCard extends StatelessWidget {
             const SizedBox(height: 16),
             // Arabic text
             Text(
-              dua.arabic,
+              dua.arabicText,
               style: const TextStyle(
                 fontFamily: 'AmiriQuran',
                 fontSize: 22,
@@ -193,44 +243,6 @@ class _DuaCard extends StatelessWidget {
               ),
               textDirection: TextDirection.rtl,
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Divider(
-              color: Theme.of(context).colorScheme.outline.withAlpha(40),
-            ),
-            const SizedBox(height: 8),
-            // Transliteration
-            Text(
-              dua.transliteration,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withAlpha(160),
-                  ),
-              textAlign: TextAlign.left,
-            ),
-            const SizedBox(height: 8),
-            // Translation
-            Text(
-              dua.translation,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    height: 1.5,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withAlpha(200),
-                  ),
-              textAlign: TextAlign.left,
-            ),
-            const SizedBox(height: 12),
-            // Reference
-            Text(
-              dua.reference,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColors.accentDua,
-                  ),
             ),
           ],
         ),

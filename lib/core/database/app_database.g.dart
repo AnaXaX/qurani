@@ -5243,6 +5243,1398 @@ class DailyActivityLogCompanion extends UpdateCompanion<DailyActivityLogData> {
   }
 }
 
+class $CachedHadithSectionsTable extends CachedHadithSections
+    with TableInfo<$CachedHadithSectionsTable, CachedHadithSection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedHadithSectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _collectionKeyMeta = const VerificationMeta(
+    'collectionKey',
+  );
+  @override
+  late final GeneratedColumn<String> collectionKey = GeneratedColumn<String>(
+    'collection_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sectionNumberMeta = const VerificationMeta(
+    'sectionNumber',
+  );
+  @override
+  late final GeneratedColumn<int> sectionNumber = GeneratedColumn<int>(
+    'section_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArabicMeta = const VerificationMeta(
+    'nameArabic',
+  );
+  @override
+  late final GeneratedColumn<String> nameArabic = GeneratedColumn<String>(
+    'name_arabic',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _hadithStartNumberMeta = const VerificationMeta(
+    'hadithStartNumber',
+  );
+  @override
+  late final GeneratedColumn<int> hadithStartNumber = GeneratedColumn<int>(
+    'hadith_start_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _hadithEndNumberMeta = const VerificationMeta(
+    'hadithEndNumber',
+  );
+  @override
+  late final GeneratedColumn<int> hadithEndNumber = GeneratedColumn<int>(
+    'hadith_end_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    collectionKey,
+    sectionNumber,
+    name,
+    nameArabic,
+    hadithStartNumber,
+    hadithEndNumber,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_hadith_sections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedHadithSection> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('collection_key')) {
+      context.handle(
+        _collectionKeyMeta,
+        collectionKey.isAcceptableOrUnknown(
+          data['collection_key']!,
+          _collectionKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionKeyMeta);
+    }
+    if (data.containsKey('section_number')) {
+      context.handle(
+        _sectionNumberMeta,
+        sectionNumber.isAcceptableOrUnknown(
+          data['section_number']!,
+          _sectionNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sectionNumberMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('name_arabic')) {
+      context.handle(
+        _nameArabicMeta,
+        nameArabic.isAcceptableOrUnknown(data['name_arabic']!, _nameArabicMeta),
+      );
+    }
+    if (data.containsKey('hadith_start_number')) {
+      context.handle(
+        _hadithStartNumberMeta,
+        hadithStartNumber.isAcceptableOrUnknown(
+          data['hadith_start_number']!,
+          _hadithStartNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hadith_end_number')) {
+      context.handle(
+        _hadithEndNumberMeta,
+        hadithEndNumber.isAcceptableOrUnknown(
+          data['hadith_end_number']!,
+          _hadithEndNumberMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {collectionKey, sectionNumber},
+  ];
+  @override
+  CachedHadithSection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedHadithSection(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      collectionKey:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}collection_key'],
+          )!,
+      sectionNumber:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}section_number'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      nameArabic:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name_arabic'],
+          )!,
+      hadithStartNumber:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}hadith_start_number'],
+          )!,
+      hadithEndNumber:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}hadith_end_number'],
+          )!,
+    );
+  }
+
+  @override
+  $CachedHadithSectionsTable createAlias(String alias) {
+    return $CachedHadithSectionsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedHadithSection extends DataClass
+    implements Insertable<CachedHadithSection> {
+  final int id;
+  final String collectionKey;
+  final int sectionNumber;
+  final String name;
+  final String nameArabic;
+  final int hadithStartNumber;
+  final int hadithEndNumber;
+  const CachedHadithSection({
+    required this.id,
+    required this.collectionKey,
+    required this.sectionNumber,
+    required this.name,
+    required this.nameArabic,
+    required this.hadithStartNumber,
+    required this.hadithEndNumber,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['collection_key'] = Variable<String>(collectionKey);
+    map['section_number'] = Variable<int>(sectionNumber);
+    map['name'] = Variable<String>(name);
+    map['name_arabic'] = Variable<String>(nameArabic);
+    map['hadith_start_number'] = Variable<int>(hadithStartNumber);
+    map['hadith_end_number'] = Variable<int>(hadithEndNumber);
+    return map;
+  }
+
+  CachedHadithSectionsCompanion toCompanion(bool nullToAbsent) {
+    return CachedHadithSectionsCompanion(
+      id: Value(id),
+      collectionKey: Value(collectionKey),
+      sectionNumber: Value(sectionNumber),
+      name: Value(name),
+      nameArabic: Value(nameArabic),
+      hadithStartNumber: Value(hadithStartNumber),
+      hadithEndNumber: Value(hadithEndNumber),
+    );
+  }
+
+  factory CachedHadithSection.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedHadithSection(
+      id: serializer.fromJson<int>(json['id']),
+      collectionKey: serializer.fromJson<String>(json['collectionKey']),
+      sectionNumber: serializer.fromJson<int>(json['sectionNumber']),
+      name: serializer.fromJson<String>(json['name']),
+      nameArabic: serializer.fromJson<String>(json['nameArabic']),
+      hadithStartNumber: serializer.fromJson<int>(json['hadithStartNumber']),
+      hadithEndNumber: serializer.fromJson<int>(json['hadithEndNumber']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'collectionKey': serializer.toJson<String>(collectionKey),
+      'sectionNumber': serializer.toJson<int>(sectionNumber),
+      'name': serializer.toJson<String>(name),
+      'nameArabic': serializer.toJson<String>(nameArabic),
+      'hadithStartNumber': serializer.toJson<int>(hadithStartNumber),
+      'hadithEndNumber': serializer.toJson<int>(hadithEndNumber),
+    };
+  }
+
+  CachedHadithSection copyWith({
+    int? id,
+    String? collectionKey,
+    int? sectionNumber,
+    String? name,
+    String? nameArabic,
+    int? hadithStartNumber,
+    int? hadithEndNumber,
+  }) => CachedHadithSection(
+    id: id ?? this.id,
+    collectionKey: collectionKey ?? this.collectionKey,
+    sectionNumber: sectionNumber ?? this.sectionNumber,
+    name: name ?? this.name,
+    nameArabic: nameArabic ?? this.nameArabic,
+    hadithStartNumber: hadithStartNumber ?? this.hadithStartNumber,
+    hadithEndNumber: hadithEndNumber ?? this.hadithEndNumber,
+  );
+  CachedHadithSection copyWithCompanion(CachedHadithSectionsCompanion data) {
+    return CachedHadithSection(
+      id: data.id.present ? data.id.value : this.id,
+      collectionKey:
+          data.collectionKey.present
+              ? data.collectionKey.value
+              : this.collectionKey,
+      sectionNumber:
+          data.sectionNumber.present
+              ? data.sectionNumber.value
+              : this.sectionNumber,
+      name: data.name.present ? data.name.value : this.name,
+      nameArabic:
+          data.nameArabic.present ? data.nameArabic.value : this.nameArabic,
+      hadithStartNumber:
+          data.hadithStartNumber.present
+              ? data.hadithStartNumber.value
+              : this.hadithStartNumber,
+      hadithEndNumber:
+          data.hadithEndNumber.present
+              ? data.hadithEndNumber.value
+              : this.hadithEndNumber,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedHadithSection(')
+          ..write('id: $id, ')
+          ..write('collectionKey: $collectionKey, ')
+          ..write('sectionNumber: $sectionNumber, ')
+          ..write('name: $name, ')
+          ..write('nameArabic: $nameArabic, ')
+          ..write('hadithStartNumber: $hadithStartNumber, ')
+          ..write('hadithEndNumber: $hadithEndNumber')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    collectionKey,
+    sectionNumber,
+    name,
+    nameArabic,
+    hadithStartNumber,
+    hadithEndNumber,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedHadithSection &&
+          other.id == this.id &&
+          other.collectionKey == this.collectionKey &&
+          other.sectionNumber == this.sectionNumber &&
+          other.name == this.name &&
+          other.nameArabic == this.nameArabic &&
+          other.hadithStartNumber == this.hadithStartNumber &&
+          other.hadithEndNumber == this.hadithEndNumber);
+}
+
+class CachedHadithSectionsCompanion
+    extends UpdateCompanion<CachedHadithSection> {
+  final Value<int> id;
+  final Value<String> collectionKey;
+  final Value<int> sectionNumber;
+  final Value<String> name;
+  final Value<String> nameArabic;
+  final Value<int> hadithStartNumber;
+  final Value<int> hadithEndNumber;
+  const CachedHadithSectionsCompanion({
+    this.id = const Value.absent(),
+    this.collectionKey = const Value.absent(),
+    this.sectionNumber = const Value.absent(),
+    this.name = const Value.absent(),
+    this.nameArabic = const Value.absent(),
+    this.hadithStartNumber = const Value.absent(),
+    this.hadithEndNumber = const Value.absent(),
+  });
+  CachedHadithSectionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String collectionKey,
+    required int sectionNumber,
+    required String name,
+    this.nameArabic = const Value.absent(),
+    this.hadithStartNumber = const Value.absent(),
+    this.hadithEndNumber = const Value.absent(),
+  }) : collectionKey = Value(collectionKey),
+       sectionNumber = Value(sectionNumber),
+       name = Value(name);
+  static Insertable<CachedHadithSection> custom({
+    Expression<int>? id,
+    Expression<String>? collectionKey,
+    Expression<int>? sectionNumber,
+    Expression<String>? name,
+    Expression<String>? nameArabic,
+    Expression<int>? hadithStartNumber,
+    Expression<int>? hadithEndNumber,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (collectionKey != null) 'collection_key': collectionKey,
+      if (sectionNumber != null) 'section_number': sectionNumber,
+      if (name != null) 'name': name,
+      if (nameArabic != null) 'name_arabic': nameArabic,
+      if (hadithStartNumber != null) 'hadith_start_number': hadithStartNumber,
+      if (hadithEndNumber != null) 'hadith_end_number': hadithEndNumber,
+    });
+  }
+
+  CachedHadithSectionsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? collectionKey,
+    Value<int>? sectionNumber,
+    Value<String>? name,
+    Value<String>? nameArabic,
+    Value<int>? hadithStartNumber,
+    Value<int>? hadithEndNumber,
+  }) {
+    return CachedHadithSectionsCompanion(
+      id: id ?? this.id,
+      collectionKey: collectionKey ?? this.collectionKey,
+      sectionNumber: sectionNumber ?? this.sectionNumber,
+      name: name ?? this.name,
+      nameArabic: nameArabic ?? this.nameArabic,
+      hadithStartNumber: hadithStartNumber ?? this.hadithStartNumber,
+      hadithEndNumber: hadithEndNumber ?? this.hadithEndNumber,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (collectionKey.present) {
+      map['collection_key'] = Variable<String>(collectionKey.value);
+    }
+    if (sectionNumber.present) {
+      map['section_number'] = Variable<int>(sectionNumber.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (nameArabic.present) {
+      map['name_arabic'] = Variable<String>(nameArabic.value);
+    }
+    if (hadithStartNumber.present) {
+      map['hadith_start_number'] = Variable<int>(hadithStartNumber.value);
+    }
+    if (hadithEndNumber.present) {
+      map['hadith_end_number'] = Variable<int>(hadithEndNumber.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedHadithSectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('collectionKey: $collectionKey, ')
+          ..write('sectionNumber: $sectionNumber, ')
+          ..write('name: $name, ')
+          ..write('nameArabic: $nameArabic, ')
+          ..write('hadithStartNumber: $hadithStartNumber, ')
+          ..write('hadithEndNumber: $hadithEndNumber')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedHadithsTable extends CachedHadiths
+    with TableInfo<$CachedHadithsTable, CachedHadith> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedHadithsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _collectionKeyMeta = const VerificationMeta(
+    'collectionKey',
+  );
+  @override
+  late final GeneratedColumn<String> collectionKey = GeneratedColumn<String>(
+    'collection_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sectionNumberMeta = const VerificationMeta(
+    'sectionNumber',
+  );
+  @override
+  late final GeneratedColumn<int> sectionNumber = GeneratedColumn<int>(
+    'section_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hadithNumberMeta = const VerificationMeta(
+    'hadithNumber',
+  );
+  @override
+  late final GeneratedColumn<int> hadithNumber = GeneratedColumn<int>(
+    'hadith_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textArabicMeta = const VerificationMeta(
+    'textArabic',
+  );
+  @override
+  late final GeneratedColumn<String> textArabic = GeneratedColumn<String>(
+    'text_arabic',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textEnglishMeta = const VerificationMeta(
+    'textEnglish',
+  );
+  @override
+  late final GeneratedColumn<String> textEnglish = GeneratedColumn<String>(
+    'text_english',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    collectionKey,
+    sectionNumber,
+    hadithNumber,
+    textArabic,
+    textEnglish,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_hadiths';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedHadith> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('collection_key')) {
+      context.handle(
+        _collectionKeyMeta,
+        collectionKey.isAcceptableOrUnknown(
+          data['collection_key']!,
+          _collectionKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionKeyMeta);
+    }
+    if (data.containsKey('section_number')) {
+      context.handle(
+        _sectionNumberMeta,
+        sectionNumber.isAcceptableOrUnknown(
+          data['section_number']!,
+          _sectionNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sectionNumberMeta);
+    }
+    if (data.containsKey('hadith_number')) {
+      context.handle(
+        _hadithNumberMeta,
+        hadithNumber.isAcceptableOrUnknown(
+          data['hadith_number']!,
+          _hadithNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_hadithNumberMeta);
+    }
+    if (data.containsKey('text_arabic')) {
+      context.handle(
+        _textArabicMeta,
+        textArabic.isAcceptableOrUnknown(data['text_arabic']!, _textArabicMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textArabicMeta);
+    }
+    if (data.containsKey('text_english')) {
+      context.handle(
+        _textEnglishMeta,
+        textEnglish.isAcceptableOrUnknown(
+          data['text_english']!,
+          _textEnglishMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {collectionKey, hadithNumber},
+  ];
+  @override
+  CachedHadith map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedHadith(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      collectionKey:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}collection_key'],
+          )!,
+      sectionNumber:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}section_number'],
+          )!,
+      hadithNumber:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}hadith_number'],
+          )!,
+      textArabic:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}text_arabic'],
+          )!,
+      textEnglish:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}text_english'],
+          )!,
+    );
+  }
+
+  @override
+  $CachedHadithsTable createAlias(String alias) {
+    return $CachedHadithsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedHadith extends DataClass implements Insertable<CachedHadith> {
+  final int id;
+  final String collectionKey;
+  final int sectionNumber;
+  final int hadithNumber;
+  final String textArabic;
+  final String textEnglish;
+  const CachedHadith({
+    required this.id,
+    required this.collectionKey,
+    required this.sectionNumber,
+    required this.hadithNumber,
+    required this.textArabic,
+    required this.textEnglish,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['collection_key'] = Variable<String>(collectionKey);
+    map['section_number'] = Variable<int>(sectionNumber);
+    map['hadith_number'] = Variable<int>(hadithNumber);
+    map['text_arabic'] = Variable<String>(textArabic);
+    map['text_english'] = Variable<String>(textEnglish);
+    return map;
+  }
+
+  CachedHadithsCompanion toCompanion(bool nullToAbsent) {
+    return CachedHadithsCompanion(
+      id: Value(id),
+      collectionKey: Value(collectionKey),
+      sectionNumber: Value(sectionNumber),
+      hadithNumber: Value(hadithNumber),
+      textArabic: Value(textArabic),
+      textEnglish: Value(textEnglish),
+    );
+  }
+
+  factory CachedHadith.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedHadith(
+      id: serializer.fromJson<int>(json['id']),
+      collectionKey: serializer.fromJson<String>(json['collectionKey']),
+      sectionNumber: serializer.fromJson<int>(json['sectionNumber']),
+      hadithNumber: serializer.fromJson<int>(json['hadithNumber']),
+      textArabic: serializer.fromJson<String>(json['textArabic']),
+      textEnglish: serializer.fromJson<String>(json['textEnglish']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'collectionKey': serializer.toJson<String>(collectionKey),
+      'sectionNumber': serializer.toJson<int>(sectionNumber),
+      'hadithNumber': serializer.toJson<int>(hadithNumber),
+      'textArabic': serializer.toJson<String>(textArabic),
+      'textEnglish': serializer.toJson<String>(textEnglish),
+    };
+  }
+
+  CachedHadith copyWith({
+    int? id,
+    String? collectionKey,
+    int? sectionNumber,
+    int? hadithNumber,
+    String? textArabic,
+    String? textEnglish,
+  }) => CachedHadith(
+    id: id ?? this.id,
+    collectionKey: collectionKey ?? this.collectionKey,
+    sectionNumber: sectionNumber ?? this.sectionNumber,
+    hadithNumber: hadithNumber ?? this.hadithNumber,
+    textArabic: textArabic ?? this.textArabic,
+    textEnglish: textEnglish ?? this.textEnglish,
+  );
+  CachedHadith copyWithCompanion(CachedHadithsCompanion data) {
+    return CachedHadith(
+      id: data.id.present ? data.id.value : this.id,
+      collectionKey:
+          data.collectionKey.present
+              ? data.collectionKey.value
+              : this.collectionKey,
+      sectionNumber:
+          data.sectionNumber.present
+              ? data.sectionNumber.value
+              : this.sectionNumber,
+      hadithNumber:
+          data.hadithNumber.present
+              ? data.hadithNumber.value
+              : this.hadithNumber,
+      textArabic:
+          data.textArabic.present ? data.textArabic.value : this.textArabic,
+      textEnglish:
+          data.textEnglish.present ? data.textEnglish.value : this.textEnglish,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedHadith(')
+          ..write('id: $id, ')
+          ..write('collectionKey: $collectionKey, ')
+          ..write('sectionNumber: $sectionNumber, ')
+          ..write('hadithNumber: $hadithNumber, ')
+          ..write('textArabic: $textArabic, ')
+          ..write('textEnglish: $textEnglish')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    collectionKey,
+    sectionNumber,
+    hadithNumber,
+    textArabic,
+    textEnglish,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedHadith &&
+          other.id == this.id &&
+          other.collectionKey == this.collectionKey &&
+          other.sectionNumber == this.sectionNumber &&
+          other.hadithNumber == this.hadithNumber &&
+          other.textArabic == this.textArabic &&
+          other.textEnglish == this.textEnglish);
+}
+
+class CachedHadithsCompanion extends UpdateCompanion<CachedHadith> {
+  final Value<int> id;
+  final Value<String> collectionKey;
+  final Value<int> sectionNumber;
+  final Value<int> hadithNumber;
+  final Value<String> textArabic;
+  final Value<String> textEnglish;
+  const CachedHadithsCompanion({
+    this.id = const Value.absent(),
+    this.collectionKey = const Value.absent(),
+    this.sectionNumber = const Value.absent(),
+    this.hadithNumber = const Value.absent(),
+    this.textArabic = const Value.absent(),
+    this.textEnglish = const Value.absent(),
+  });
+  CachedHadithsCompanion.insert({
+    this.id = const Value.absent(),
+    required String collectionKey,
+    required int sectionNumber,
+    required int hadithNumber,
+    required String textArabic,
+    this.textEnglish = const Value.absent(),
+  }) : collectionKey = Value(collectionKey),
+       sectionNumber = Value(sectionNumber),
+       hadithNumber = Value(hadithNumber),
+       textArabic = Value(textArabic);
+  static Insertable<CachedHadith> custom({
+    Expression<int>? id,
+    Expression<String>? collectionKey,
+    Expression<int>? sectionNumber,
+    Expression<int>? hadithNumber,
+    Expression<String>? textArabic,
+    Expression<String>? textEnglish,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (collectionKey != null) 'collection_key': collectionKey,
+      if (sectionNumber != null) 'section_number': sectionNumber,
+      if (hadithNumber != null) 'hadith_number': hadithNumber,
+      if (textArabic != null) 'text_arabic': textArabic,
+      if (textEnglish != null) 'text_english': textEnglish,
+    });
+  }
+
+  CachedHadithsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? collectionKey,
+    Value<int>? sectionNumber,
+    Value<int>? hadithNumber,
+    Value<String>? textArabic,
+    Value<String>? textEnglish,
+  }) {
+    return CachedHadithsCompanion(
+      id: id ?? this.id,
+      collectionKey: collectionKey ?? this.collectionKey,
+      sectionNumber: sectionNumber ?? this.sectionNumber,
+      hadithNumber: hadithNumber ?? this.hadithNumber,
+      textArabic: textArabic ?? this.textArabic,
+      textEnglish: textEnglish ?? this.textEnglish,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (collectionKey.present) {
+      map['collection_key'] = Variable<String>(collectionKey.value);
+    }
+    if (sectionNumber.present) {
+      map['section_number'] = Variable<int>(sectionNumber.value);
+    }
+    if (hadithNumber.present) {
+      map['hadith_number'] = Variable<int>(hadithNumber.value);
+    }
+    if (textArabic.present) {
+      map['text_arabic'] = Variable<String>(textArabic.value);
+    }
+    if (textEnglish.present) {
+      map['text_english'] = Variable<String>(textEnglish.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedHadithsCompanion(')
+          ..write('id: $id, ')
+          ..write('collectionKey: $collectionKey, ')
+          ..write('sectionNumber: $sectionNumber, ')
+          ..write('hadithNumber: $hadithNumber, ')
+          ..write('textArabic: $textArabic, ')
+          ..write('textEnglish: $textEnglish')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedAzkarTable extends CachedAzkar
+    with TableInfo<$CachedAzkarTable, CachedAzkarData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedAzkarTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+    'category_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryTitleMeta = const VerificationMeta(
+    'categoryTitle',
+  );
+  @override
+  late final GeneratedColumn<String> categoryTitle = GeneratedColumn<String>(
+    'category_title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<int> itemId = GeneratedColumn<int>(
+    'item_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _arabicTextMeta = const VerificationMeta(
+    'arabicText',
+  );
+  @override
+  late final GeneratedColumn<String> arabicText = GeneratedColumn<String>(
+    'arabic_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repeatCountMeta = const VerificationMeta(
+    'repeatCount',
+  );
+  @override
+  late final GeneratedColumn<int> repeatCount = GeneratedColumn<int>(
+    'repeat_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _audioUrlMeta = const VerificationMeta(
+    'audioUrl',
+  );
+  @override
+  late final GeneratedColumn<String> audioUrl = GeneratedColumn<String>(
+    'audio_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    categoryId,
+    categoryTitle,
+    itemId,
+    arabicText,
+    repeatCount,
+    audioUrl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_azkar';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedAzkarData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryIdMeta);
+    }
+    if (data.containsKey('category_title')) {
+      context.handle(
+        _categoryTitleMeta,
+        categoryTitle.isAcceptableOrUnknown(
+          data['category_title']!,
+          _categoryTitleMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryTitleMeta);
+    }
+    if (data.containsKey('item_id')) {
+      context.handle(
+        _itemIdMeta,
+        itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('arabic_text')) {
+      context.handle(
+        _arabicTextMeta,
+        arabicText.isAcceptableOrUnknown(data['arabic_text']!, _arabicTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_arabicTextMeta);
+    }
+    if (data.containsKey('repeat_count')) {
+      context.handle(
+        _repeatCountMeta,
+        repeatCount.isAcceptableOrUnknown(
+          data['repeat_count']!,
+          _repeatCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('audio_url')) {
+      context.handle(
+        _audioUrlMeta,
+        audioUrl.isAcceptableOrUnknown(data['audio_url']!, _audioUrlMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {categoryId, itemId},
+  ];
+  @override
+  CachedAzkarData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedAzkarData(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      categoryId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}category_id'],
+          )!,
+      categoryTitle:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}category_title'],
+          )!,
+      itemId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}item_id'],
+          )!,
+      arabicText:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}arabic_text'],
+          )!,
+      repeatCount:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}repeat_count'],
+          )!,
+      audioUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}audio_url'],
+          )!,
+    );
+  }
+
+  @override
+  $CachedAzkarTable createAlias(String alias) {
+    return $CachedAzkarTable(attachedDatabase, alias);
+  }
+}
+
+class CachedAzkarData extends DataClass implements Insertable<CachedAzkarData> {
+  final int id;
+  final int categoryId;
+  final String categoryTitle;
+  final int itemId;
+  final String arabicText;
+  final int repeatCount;
+  final String audioUrl;
+  const CachedAzkarData({
+    required this.id,
+    required this.categoryId,
+    required this.categoryTitle,
+    required this.itemId,
+    required this.arabicText,
+    required this.repeatCount,
+    required this.audioUrl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category_id'] = Variable<int>(categoryId);
+    map['category_title'] = Variable<String>(categoryTitle);
+    map['item_id'] = Variable<int>(itemId);
+    map['arabic_text'] = Variable<String>(arabicText);
+    map['repeat_count'] = Variable<int>(repeatCount);
+    map['audio_url'] = Variable<String>(audioUrl);
+    return map;
+  }
+
+  CachedAzkarCompanion toCompanion(bool nullToAbsent) {
+    return CachedAzkarCompanion(
+      id: Value(id),
+      categoryId: Value(categoryId),
+      categoryTitle: Value(categoryTitle),
+      itemId: Value(itemId),
+      arabicText: Value(arabicText),
+      repeatCount: Value(repeatCount),
+      audioUrl: Value(audioUrl),
+    );
+  }
+
+  factory CachedAzkarData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedAzkarData(
+      id: serializer.fromJson<int>(json['id']),
+      categoryId: serializer.fromJson<int>(json['categoryId']),
+      categoryTitle: serializer.fromJson<String>(json['categoryTitle']),
+      itemId: serializer.fromJson<int>(json['itemId']),
+      arabicText: serializer.fromJson<String>(json['arabicText']),
+      repeatCount: serializer.fromJson<int>(json['repeatCount']),
+      audioUrl: serializer.fromJson<String>(json['audioUrl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'categoryId': serializer.toJson<int>(categoryId),
+      'categoryTitle': serializer.toJson<String>(categoryTitle),
+      'itemId': serializer.toJson<int>(itemId),
+      'arabicText': serializer.toJson<String>(arabicText),
+      'repeatCount': serializer.toJson<int>(repeatCount),
+      'audioUrl': serializer.toJson<String>(audioUrl),
+    };
+  }
+
+  CachedAzkarData copyWith({
+    int? id,
+    int? categoryId,
+    String? categoryTitle,
+    int? itemId,
+    String? arabicText,
+    int? repeatCount,
+    String? audioUrl,
+  }) => CachedAzkarData(
+    id: id ?? this.id,
+    categoryId: categoryId ?? this.categoryId,
+    categoryTitle: categoryTitle ?? this.categoryTitle,
+    itemId: itemId ?? this.itemId,
+    arabicText: arabicText ?? this.arabicText,
+    repeatCount: repeatCount ?? this.repeatCount,
+    audioUrl: audioUrl ?? this.audioUrl,
+  );
+  CachedAzkarData copyWithCompanion(CachedAzkarCompanion data) {
+    return CachedAzkarData(
+      id: data.id.present ? data.id.value : this.id,
+      categoryId:
+          data.categoryId.present ? data.categoryId.value : this.categoryId,
+      categoryTitle:
+          data.categoryTitle.present
+              ? data.categoryTitle.value
+              : this.categoryTitle,
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      arabicText:
+          data.arabicText.present ? data.arabicText.value : this.arabicText,
+      repeatCount:
+          data.repeatCount.present ? data.repeatCount.value : this.repeatCount,
+      audioUrl: data.audioUrl.present ? data.audioUrl.value : this.audioUrl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedAzkarData(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('categoryTitle: $categoryTitle, ')
+          ..write('itemId: $itemId, ')
+          ..write('arabicText: $arabicText, ')
+          ..write('repeatCount: $repeatCount, ')
+          ..write('audioUrl: $audioUrl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    categoryId,
+    categoryTitle,
+    itemId,
+    arabicText,
+    repeatCount,
+    audioUrl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedAzkarData &&
+          other.id == this.id &&
+          other.categoryId == this.categoryId &&
+          other.categoryTitle == this.categoryTitle &&
+          other.itemId == this.itemId &&
+          other.arabicText == this.arabicText &&
+          other.repeatCount == this.repeatCount &&
+          other.audioUrl == this.audioUrl);
+}
+
+class CachedAzkarCompanion extends UpdateCompanion<CachedAzkarData> {
+  final Value<int> id;
+  final Value<int> categoryId;
+  final Value<String> categoryTitle;
+  final Value<int> itemId;
+  final Value<String> arabicText;
+  final Value<int> repeatCount;
+  final Value<String> audioUrl;
+  const CachedAzkarCompanion({
+    this.id = const Value.absent(),
+    this.categoryId = const Value.absent(),
+    this.categoryTitle = const Value.absent(),
+    this.itemId = const Value.absent(),
+    this.arabicText = const Value.absent(),
+    this.repeatCount = const Value.absent(),
+    this.audioUrl = const Value.absent(),
+  });
+  CachedAzkarCompanion.insert({
+    this.id = const Value.absent(),
+    required int categoryId,
+    required String categoryTitle,
+    required int itemId,
+    required String arabicText,
+    this.repeatCount = const Value.absent(),
+    this.audioUrl = const Value.absent(),
+  }) : categoryId = Value(categoryId),
+       categoryTitle = Value(categoryTitle),
+       itemId = Value(itemId),
+       arabicText = Value(arabicText);
+  static Insertable<CachedAzkarData> custom({
+    Expression<int>? id,
+    Expression<int>? categoryId,
+    Expression<String>? categoryTitle,
+    Expression<int>? itemId,
+    Expression<String>? arabicText,
+    Expression<int>? repeatCount,
+    Expression<String>? audioUrl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (categoryId != null) 'category_id': categoryId,
+      if (categoryTitle != null) 'category_title': categoryTitle,
+      if (itemId != null) 'item_id': itemId,
+      if (arabicText != null) 'arabic_text': arabicText,
+      if (repeatCount != null) 'repeat_count': repeatCount,
+      if (audioUrl != null) 'audio_url': audioUrl,
+    });
+  }
+
+  CachedAzkarCompanion copyWith({
+    Value<int>? id,
+    Value<int>? categoryId,
+    Value<String>? categoryTitle,
+    Value<int>? itemId,
+    Value<String>? arabicText,
+    Value<int>? repeatCount,
+    Value<String>? audioUrl,
+  }) {
+    return CachedAzkarCompanion(
+      id: id ?? this.id,
+      categoryId: categoryId ?? this.categoryId,
+      categoryTitle: categoryTitle ?? this.categoryTitle,
+      itemId: itemId ?? this.itemId,
+      arabicText: arabicText ?? this.arabicText,
+      repeatCount: repeatCount ?? this.repeatCount,
+      audioUrl: audioUrl ?? this.audioUrl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (categoryId.present) {
+      map['category_id'] = Variable<int>(categoryId.value);
+    }
+    if (categoryTitle.present) {
+      map['category_title'] = Variable<String>(categoryTitle.value);
+    }
+    if (itemId.present) {
+      map['item_id'] = Variable<int>(itemId.value);
+    }
+    if (arabicText.present) {
+      map['arabic_text'] = Variable<String>(arabicText.value);
+    }
+    if (repeatCount.present) {
+      map['repeat_count'] = Variable<int>(repeatCount.value);
+    }
+    if (audioUrl.present) {
+      map['audio_url'] = Variable<String>(audioUrl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedAzkarCompanion(')
+          ..write('id: $id, ')
+          ..write('categoryId: $categoryId, ')
+          ..write('categoryTitle: $categoryTitle, ')
+          ..write('itemId: $itemId, ')
+          ..write('arabicText: $arabicText, ')
+          ..write('repeatCount: $repeatCount, ')
+          ..write('audioUrl: $audioUrl')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5267,6 +6659,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DailyActivityLogTable dailyActivityLog = $DailyActivityLogTable(
     this,
   );
+  late final $CachedHadithSectionsTable cachedHadithSections =
+      $CachedHadithSectionsTable(this);
+  late final $CachedHadithsTable cachedHadiths = $CachedHadithsTable(this);
+  late final $CachedAzkarTable cachedAzkar = $CachedAzkarTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5284,6 +6680,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     achievements,
     recordingSessions,
     dailyActivityLog,
+    cachedHadithSections,
+    cachedHadiths,
+    cachedAzkar,
   ];
 }
 
@@ -9400,6 +10799,756 @@ typedef $$DailyActivityLogTableProcessedTableManager =
       DailyActivityLogData,
       PrefetchHooks Function()
     >;
+typedef $$CachedHadithSectionsTableCreateCompanionBuilder =
+    CachedHadithSectionsCompanion Function({
+      Value<int> id,
+      required String collectionKey,
+      required int sectionNumber,
+      required String name,
+      Value<String> nameArabic,
+      Value<int> hadithStartNumber,
+      Value<int> hadithEndNumber,
+    });
+typedef $$CachedHadithSectionsTableUpdateCompanionBuilder =
+    CachedHadithSectionsCompanion Function({
+      Value<int> id,
+      Value<String> collectionKey,
+      Value<int> sectionNumber,
+      Value<String> name,
+      Value<String> nameArabic,
+      Value<int> hadithStartNumber,
+      Value<int> hadithEndNumber,
+    });
+
+class $$CachedHadithSectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedHadithSectionsTable> {
+  $$CachedHadithSectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameArabic => $composableBuilder(
+    column: $table.nameArabic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hadithStartNumber => $composableBuilder(
+    column: $table.hadithStartNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hadithEndNumber => $composableBuilder(
+    column: $table.hadithEndNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedHadithSectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedHadithSectionsTable> {
+  $$CachedHadithSectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameArabic => $composableBuilder(
+    column: $table.nameArabic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hadithStartNumber => $composableBuilder(
+    column: $table.hadithStartNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hadithEndNumber => $composableBuilder(
+    column: $table.hadithEndNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedHadithSectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedHadithSectionsTable> {
+  $$CachedHadithSectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get nameArabic => $composableBuilder(
+    column: $table.nameArabic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hadithStartNumber => $composableBuilder(
+    column: $table.hadithStartNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hadithEndNumber => $composableBuilder(
+    column: $table.hadithEndNumber,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedHadithSectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedHadithSectionsTable,
+          CachedHadithSection,
+          $$CachedHadithSectionsTableFilterComposer,
+          $$CachedHadithSectionsTableOrderingComposer,
+          $$CachedHadithSectionsTableAnnotationComposer,
+          $$CachedHadithSectionsTableCreateCompanionBuilder,
+          $$CachedHadithSectionsTableUpdateCompanionBuilder,
+          (
+            CachedHadithSection,
+            BaseReferences<
+              _$AppDatabase,
+              $CachedHadithSectionsTable,
+              CachedHadithSection
+            >,
+          ),
+          CachedHadithSection,
+          PrefetchHooks Function()
+        > {
+  $$CachedHadithSectionsTableTableManager(
+    _$AppDatabase db,
+    $CachedHadithSectionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CachedHadithSectionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CachedHadithSectionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CachedHadithSectionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> collectionKey = const Value.absent(),
+                Value<int> sectionNumber = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> nameArabic = const Value.absent(),
+                Value<int> hadithStartNumber = const Value.absent(),
+                Value<int> hadithEndNumber = const Value.absent(),
+              }) => CachedHadithSectionsCompanion(
+                id: id,
+                collectionKey: collectionKey,
+                sectionNumber: sectionNumber,
+                name: name,
+                nameArabic: nameArabic,
+                hadithStartNumber: hadithStartNumber,
+                hadithEndNumber: hadithEndNumber,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String collectionKey,
+                required int sectionNumber,
+                required String name,
+                Value<String> nameArabic = const Value.absent(),
+                Value<int> hadithStartNumber = const Value.absent(),
+                Value<int> hadithEndNumber = const Value.absent(),
+              }) => CachedHadithSectionsCompanion.insert(
+                id: id,
+                collectionKey: collectionKey,
+                sectionNumber: sectionNumber,
+                name: name,
+                nameArabic: nameArabic,
+                hadithStartNumber: hadithStartNumber,
+                hadithEndNumber: hadithEndNumber,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedHadithSectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedHadithSectionsTable,
+      CachedHadithSection,
+      $$CachedHadithSectionsTableFilterComposer,
+      $$CachedHadithSectionsTableOrderingComposer,
+      $$CachedHadithSectionsTableAnnotationComposer,
+      $$CachedHadithSectionsTableCreateCompanionBuilder,
+      $$CachedHadithSectionsTableUpdateCompanionBuilder,
+      (
+        CachedHadithSection,
+        BaseReferences<
+          _$AppDatabase,
+          $CachedHadithSectionsTable,
+          CachedHadithSection
+        >,
+      ),
+      CachedHadithSection,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedHadithsTableCreateCompanionBuilder =
+    CachedHadithsCompanion Function({
+      Value<int> id,
+      required String collectionKey,
+      required int sectionNumber,
+      required int hadithNumber,
+      required String textArabic,
+      Value<String> textEnglish,
+    });
+typedef $$CachedHadithsTableUpdateCompanionBuilder =
+    CachedHadithsCompanion Function({
+      Value<int> id,
+      Value<String> collectionKey,
+      Value<int> sectionNumber,
+      Value<int> hadithNumber,
+      Value<String> textArabic,
+      Value<String> textEnglish,
+    });
+
+class $$CachedHadithsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedHadithsTable> {
+  $$CachedHadithsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hadithNumber => $composableBuilder(
+    column: $table.hadithNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textEnglish => $composableBuilder(
+    column: $table.textEnglish,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedHadithsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedHadithsTable> {
+  $$CachedHadithsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hadithNumber => $composableBuilder(
+    column: $table.hadithNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textEnglish => $composableBuilder(
+    column: $table.textEnglish,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedHadithsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedHadithsTable> {
+  $$CachedHadithsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get collectionKey => $composableBuilder(
+    column: $table.collectionKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sectionNumber => $composableBuilder(
+    column: $table.sectionNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hadithNumber => $composableBuilder(
+    column: $table.hadithNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get textEnglish => $composableBuilder(
+    column: $table.textEnglish,
+    builder: (column) => column,
+  );
+}
+
+class $$CachedHadithsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedHadithsTable,
+          CachedHadith,
+          $$CachedHadithsTableFilterComposer,
+          $$CachedHadithsTableOrderingComposer,
+          $$CachedHadithsTableAnnotationComposer,
+          $$CachedHadithsTableCreateCompanionBuilder,
+          $$CachedHadithsTableUpdateCompanionBuilder,
+          (
+            CachedHadith,
+            BaseReferences<_$AppDatabase, $CachedHadithsTable, CachedHadith>,
+          ),
+          CachedHadith,
+          PrefetchHooks Function()
+        > {
+  $$CachedHadithsTableTableManager(_$AppDatabase db, $CachedHadithsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CachedHadithsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () =>
+                  $$CachedHadithsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$CachedHadithsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> collectionKey = const Value.absent(),
+                Value<int> sectionNumber = const Value.absent(),
+                Value<int> hadithNumber = const Value.absent(),
+                Value<String> textArabic = const Value.absent(),
+                Value<String> textEnglish = const Value.absent(),
+              }) => CachedHadithsCompanion(
+                id: id,
+                collectionKey: collectionKey,
+                sectionNumber: sectionNumber,
+                hadithNumber: hadithNumber,
+                textArabic: textArabic,
+                textEnglish: textEnglish,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String collectionKey,
+                required int sectionNumber,
+                required int hadithNumber,
+                required String textArabic,
+                Value<String> textEnglish = const Value.absent(),
+              }) => CachedHadithsCompanion.insert(
+                id: id,
+                collectionKey: collectionKey,
+                sectionNumber: sectionNumber,
+                hadithNumber: hadithNumber,
+                textArabic: textArabic,
+                textEnglish: textEnglish,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedHadithsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedHadithsTable,
+      CachedHadith,
+      $$CachedHadithsTableFilterComposer,
+      $$CachedHadithsTableOrderingComposer,
+      $$CachedHadithsTableAnnotationComposer,
+      $$CachedHadithsTableCreateCompanionBuilder,
+      $$CachedHadithsTableUpdateCompanionBuilder,
+      (
+        CachedHadith,
+        BaseReferences<_$AppDatabase, $CachedHadithsTable, CachedHadith>,
+      ),
+      CachedHadith,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedAzkarTableCreateCompanionBuilder =
+    CachedAzkarCompanion Function({
+      Value<int> id,
+      required int categoryId,
+      required String categoryTitle,
+      required int itemId,
+      required String arabicText,
+      Value<int> repeatCount,
+      Value<String> audioUrl,
+    });
+typedef $$CachedAzkarTableUpdateCompanionBuilder =
+    CachedAzkarCompanion Function({
+      Value<int> id,
+      Value<int> categoryId,
+      Value<String> categoryTitle,
+      Value<int> itemId,
+      Value<String> arabicText,
+      Value<int> repeatCount,
+      Value<String> audioUrl,
+    });
+
+class $$CachedAzkarTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedAzkarTable> {
+  $$CachedAzkarTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryTitle => $composableBuilder(
+    column: $table.categoryTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get itemId => $composableBuilder(
+    column: $table.itemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get arabicText => $composableBuilder(
+    column: $table.arabicText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repeatCount => $composableBuilder(
+    column: $table.repeatCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get audioUrl => $composableBuilder(
+    column: $table.audioUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedAzkarTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedAzkarTable> {
+  $$CachedAzkarTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryTitle => $composableBuilder(
+    column: $table.categoryTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get itemId => $composableBuilder(
+    column: $table.itemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get arabicText => $composableBuilder(
+    column: $table.arabicText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repeatCount => $composableBuilder(
+    column: $table.repeatCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get audioUrl => $composableBuilder(
+    column: $table.audioUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedAzkarTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedAzkarTable> {
+  $$CachedAzkarTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get categoryTitle => $composableBuilder(
+    column: $table.categoryTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get itemId =>
+      $composableBuilder(column: $table.itemId, builder: (column) => column);
+
+  GeneratedColumn<String> get arabicText => $composableBuilder(
+    column: $table.arabicText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repeatCount => $composableBuilder(
+    column: $table.repeatCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get audioUrl =>
+      $composableBuilder(column: $table.audioUrl, builder: (column) => column);
+}
+
+class $$CachedAzkarTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedAzkarTable,
+          CachedAzkarData,
+          $$CachedAzkarTableFilterComposer,
+          $$CachedAzkarTableOrderingComposer,
+          $$CachedAzkarTableAnnotationComposer,
+          $$CachedAzkarTableCreateCompanionBuilder,
+          $$CachedAzkarTableUpdateCompanionBuilder,
+          (
+            CachedAzkarData,
+            BaseReferences<_$AppDatabase, $CachedAzkarTable, CachedAzkarData>,
+          ),
+          CachedAzkarData,
+          PrefetchHooks Function()
+        > {
+  $$CachedAzkarTableTableManager(_$AppDatabase db, $CachedAzkarTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CachedAzkarTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$CachedAzkarTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$CachedAzkarTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> categoryId = const Value.absent(),
+                Value<String> categoryTitle = const Value.absent(),
+                Value<int> itemId = const Value.absent(),
+                Value<String> arabicText = const Value.absent(),
+                Value<int> repeatCount = const Value.absent(),
+                Value<String> audioUrl = const Value.absent(),
+              }) => CachedAzkarCompanion(
+                id: id,
+                categoryId: categoryId,
+                categoryTitle: categoryTitle,
+                itemId: itemId,
+                arabicText: arabicText,
+                repeatCount: repeatCount,
+                audioUrl: audioUrl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int categoryId,
+                required String categoryTitle,
+                required int itemId,
+                required String arabicText,
+                Value<int> repeatCount = const Value.absent(),
+                Value<String> audioUrl = const Value.absent(),
+              }) => CachedAzkarCompanion.insert(
+                id: id,
+                categoryId: categoryId,
+                categoryTitle: categoryTitle,
+                itemId: itemId,
+                arabicText: arabicText,
+                repeatCount: repeatCount,
+                audioUrl: audioUrl,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedAzkarTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedAzkarTable,
+      CachedAzkarData,
+      $$CachedAzkarTableFilterComposer,
+      $$CachedAzkarTableOrderingComposer,
+      $$CachedAzkarTableAnnotationComposer,
+      $$CachedAzkarTableCreateCompanionBuilder,
+      $$CachedAzkarTableUpdateCompanionBuilder,
+      (
+        CachedAzkarData,
+        BaseReferences<_$AppDatabase, $CachedAzkarTable, CachedAzkarData>,
+      ),
+      CachedAzkarData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9428,4 +11577,10 @@ class $AppDatabaseManager {
       $$RecordingSessionsTableTableManager(_db, _db.recordingSessions);
   $$DailyActivityLogTableTableManager get dailyActivityLog =>
       $$DailyActivityLogTableTableManager(_db, _db.dailyActivityLog);
+  $$CachedHadithSectionsTableTableManager get cachedHadithSections =>
+      $$CachedHadithSectionsTableTableManager(_db, _db.cachedHadithSections);
+  $$CachedHadithsTableTableManager get cachedHadiths =>
+      $$CachedHadithsTableTableManager(_db, _db.cachedHadiths);
+  $$CachedAzkarTableTableManager get cachedAzkar =>
+      $$CachedAzkarTableTableManager(_db, _db.cachedAzkar);
 }

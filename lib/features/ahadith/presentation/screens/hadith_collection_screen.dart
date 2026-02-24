@@ -1,76 +1,149 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../data/models/hadith.dart';
+import '../../data/services/hadith_api_service.dart';
+import '../providers/hadith_providers.dart';
 import 'hadith_list_screen.dart';
 
-class HadithCollectionScreen extends StatelessWidget {
-  final HadithCollection collection;
+class HadithCollectionScreen extends ConsumerWidget {
+  final HadithCollectionInfo collection;
 
   const HadithCollectionScreen({super.key, required this.collection});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sectionsAsync = ref.watch(hadithSectionsProvider(collection.key));
+
     return Scaffold(
       appBar: AppBar(title: Text(collection.name)),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: collection.books.length,
-        itemBuilder: (context, index) {
-          final book = collection.books[index];
+      body: sectionsAsync.when(
+        loading: () => _buildShimmer(context),
+        error: (error, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.cloud_off_rounded,
+                    size: 48,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withAlpha(100)),
+                const SizedBox(height: 16),
+                Text(
+                  'Could not load sections.\nCheck your internet connection.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(160),
+                      ),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () =>
+                      ref.invalidate(hadithSectionsProvider(collection.key)),
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (sections) => ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: sections.length,
+          itemBuilder: (context, index) {
+            final section = sections[index];
+            final hadithCount = section.hadithEndNumber > 0
+                ? section.hadithEndNumber - section.hadithStartNumber + 1
+                : 0;
 
-          return Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: ListTile(
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.accentAhadith.withAlpha(20),
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '${book.bookNumber}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.accentAhadith,
-                    fontSize: 13,
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.accentAhadith.withAlpha(20),
+                    shape: BoxShape.circle,
                   ),
-                ),
-              ),
-              title: Text(
-                book.name,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(
-                book.nameArabic,
-                style: const TextStyle(fontFamily: 'AmiriQuran', fontSize: 14),
-                textDirection: TextDirection.rtl,
-              ),
-              trailing: Text(
-                '${book.hadiths.length}',
-                style: TextStyle(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withAlpha(140),
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HadithListScreen(
-                      book: book,
-                      collectionName: collection.name,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${section.sectionNumber}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.accentAhadith,
+                      fontSize: 13,
                     ),
                   ),
-                );
-              },
-            ),
-          );
-        },
+                ),
+                title: Text(
+                  section.name,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                trailing: hadithCount > 0
+                    ? Text(
+                        '$hadithCount',
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(140),
+                        ),
+                      )
+                    : null,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HadithListScreen(
+                        collectionKey: collection.key,
+                        collectionName: collection.name,
+                        sectionNumber: section.sectionNumber,
+                        sectionName: section.name,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildShimmer(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 12,
+      itemBuilder: (context, index) {
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ListTile(
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                shape: BoxShape.circle,
+              ),
+            ),
+            title: Container(
+              height: 14,
+              width: 180,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
