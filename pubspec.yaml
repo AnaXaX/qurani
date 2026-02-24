@@ -60,9 +60,11 @@ dependencies:
   intl: ^0.19.0
   equatable: ^2.0.7
   connectivity_plus: ^6.1.1
+  in_app_review: ^2.0.10
   home_widget: ^0.7.0
   flutter_timezone: ^5.0.1
   timezone: ^0.10.1
+  scrollable_positioned_list: ^0.3.8
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,7 @@ import 'core/l10n/app_localizations.dart';
 import 'core/l10n/locale_provider.dart';
 import 'core/providers/reading_preferences_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/services/app_usage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'features/ahadith/presentation/screens/ahadith_screen.dart';
@@ -30,10 +31,13 @@ class QuranApp extends ConsumerStatefulWidget {
 class _QuranAppState extends ConsumerState<QuranApp> {
   bool _showSplash = true;
   bool _startupHandled = false;
+  late final AppUsageService _usageService;
 
   @override
   void initState() {
     super.initState();
+    _usageService = AppUsageService(navigatorKey: rootNavigatorKey);
+    _usageService.init();
     // Listen for widget taps when the app is already running
     _widgetChannel.setMethodCallHandler((call) async {
       if (call.method == 'navigateTo') {
@@ -48,6 +52,12 @@ class _QuranAppState extends ConsumerState<QuranApp> {
         }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _usageService.dispose();
+    super.dispose();
   }
 
   @override
