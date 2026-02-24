@@ -17,11 +17,11 @@ class PrayerTimeWidgetProvider : AppWidgetProvider() {
             try {
                 val views = RemoteViews(context.packageName, R.layout.prayer_time_widget).apply {
                     setTextViewText(R.id.prayer_name,
-                        prefs.getString("prayer_name", "Dhuhr"))
+                        prefs.getString("prayer_name", "Prayer Time"))
                     setTextViewText(R.id.prayer_time,
-                        prefs.getString("prayer_time", "12:30 PM"))
+                        prefs.getString("prayer_time", "Tap to set up"))
                     setTextViewText(R.id.prayer_countdown,
-                        prefs.getString("prayer_countdown", ""))
+                        prefs.getString("prayer_countdown", "Open Prayer Times in app"))
                 }
                 appWidgetManager.updateAppWidget(widgetId, views)
             } catch (e: Exception) {

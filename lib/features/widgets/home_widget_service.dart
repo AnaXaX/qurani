@@ -1,4 +1,6 @@
+import 'package:adhan_dart/adhan_dart.dart' as adhan;
 import 'package:home_widget/home_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/hijri_utils.dart';
 import '../islamic_events/data/islamic_events_service.dart';
 
@@ -92,15 +94,102 @@ class HomeWidgetService {
     );
   }
 
+  /// Auto-calculate prayer times from saved GPS coords (if available).
+  /// Falls back to a "setup" prompt if no coords have been saved yet.
+  static Future<void> _autoUpdatePrayerWidget() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lat = prefs.getDouble('prayer_lat');
+    final lng = prefs.getDouble('prayer_lng');
+
+    if (lat == null || lng == null) {
+      // No GPS coords saved yet — show setup prompt
+      await updatePrayerTimeWidget(
+        prayerName: 'Prayer Time',
+        prayerTime: 'Tap to set up',
+        countdown: 'Open Prayer Times in app',
+      );
+      return;
+    }
+
+    // Calculate from saved coords (offline, no GPS needed)
+    final coordinates = adhan.Coordinates(lat, lng);
+    final now = DateTime.now();
+    final methodName = prefs.getString('prayer_calc_method') ?? 'Muslim World League';
+    final params = _getCalcParams(methodName);
+    params.madhab = adhan.Madhab.shafi;
+
+    final prayerTimes = adhan.PrayerTimes(
+      coordinates: coordinates,
+      date: DateTime(now.year, now.month, now.day),
+      calculationParameters: params,
+    );
+
+    // Find next prayer
+    final times = [
+      ('Fajr', prayerTimes.fajr.toLocal()),
+      ('Dhuhr', prayerTimes.dhuhr.toLocal()),
+      ('Asr', prayerTimes.asr.toLocal()),
+      ('Maghrib', prayerTimes.maghrib.toLocal()),
+      ('Isha', prayerTimes.isha.toLocal()),
+    ];
+
+    String nextName = times.first.$1;
+    DateTime nextTime = times.first.$2;
+    for (final (name, time) in times) {
+      if (time.isAfter(now)) {
+        nextName = name;
+        nextTime = time;
+        break;
+      }
+    }
+
+    // Format time
+    final h = nextTime.hour;
+    final m = nextTime.minute.toString().padLeft(2, '0');
+    final period = h >= 12 ? 'PM' : 'AM';
+    final hour12 = h == 0 ? 12 : (h > 12 ? h - 12 : h);
+    final timeStr = '$hour12:$m $period';
+
+    // Countdown
+    final diff = nextTime.difference(now);
+    String countdown;
+    if (diff.isNegative) {
+      countdown = 'Tomorrow';
+    } else if (diff.inHours > 0) {
+      countdown = 'in ${diff.inHours}h ${diff.inMinutes % 60}m';
+    } else {
+      countdown = 'in ${diff.inMinutes}m';
+    }
+
+    await updatePrayerTimeWidget(
+      prayerName: nextName,
+      prayerTime: timeStr,
+      countdown: countdown,
+    );
+  }
+
+  static adhan.CalculationParameters _getCalcParams(String name) {
+    switch (name) {
+      case 'Egyptian': return adhan.CalculationMethodParameters.egyptian();
+      case 'Karachi': return adhan.CalculationMethodParameters.karachi();
+      case 'Umm Al-Qura': return adhan.CalculationMethodParameters.ummAlQura();
+      case 'Dubai': return adhan.CalculationMethodParameters.dubai();
+      case 'North America (ISNA)': return adhan.CalculationMethodParameters.northAmerica();
+      case 'Kuwait': return adhan.CalculationMethodParameters.kuwait();
+      case 'Qatar': return adhan.CalculationMethodParameters.qatar();
+      case 'Singapore': return adhan.CalculationMethodParameters.singapore();
+      case 'Turkey': return adhan.CalculationMethodParameters.turkiye();
+      case 'Tehran': return adhan.CalculationMethodParameters.tehran();
+      case 'Morocco': return adhan.CalculationMethodParameters.morocco();
+      default: return adhan.CalculationMethodParameters.muslimWorldLeague();
+    }
+  }
+
   /// Initialize all widgets on app start.
   static Future<void> initialize() async {
     try {
       await updateDailyAyahWidget();
-      await updatePrayerTimeWidget(
-        prayerName: 'Dhuhr',
-        prayerTime: '12:30 PM',
-        countdown: 'Open app for live times',
-      );
+      await _autoUpdatePrayerWidget();
       await updateHijriWidget();
       await updateAzkarWidget();
       await updateHadithWidget();
