@@ -1,19 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:adhan_dart/adhan_dart.dart' as adhan;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/prayer_reminder_provider.dart';
+import '../../data/prayer_reminder_service.dart';
+import 'prayer_notification_settings_screen.dart';
 
 /// Prayer times screen using adhan_dart for offline calculation.
 /// Calculates prayer times from GPS coordinates — no API needed.
-class PrayerTimesScreen extends StatefulWidget {
+class PrayerTimesScreen extends ConsumerStatefulWidget {
   const PrayerTimesScreen({super.key});
 
   @override
-  State<PrayerTimesScreen> createState() => _PrayerTimesScreenState();
+  ConsumerState<PrayerTimesScreen> createState() => _PrayerTimesScreenState();
 }
 
-class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
+class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
   bool _loading = true;
   String? _error;
   String _locationName = '';
@@ -346,6 +350,16 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         title: const Text('Prayer Times'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: 'Prayer notifications',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PrayerNotificationSettingsScreen(),
+              ),
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.calculate_outlined),
             tooltip: 'Calculation method',
             onPressed: _showMethodPicker,
@@ -578,6 +592,10 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                         : null,
                   ),
                 ),
+                // Bell icon for reminder toggle (skip Sunrise)
+                if (prayer.name != 'Sunrise' &&
+                    !prayer.name.contains('tomorrow'))
+                  _BellToggle(prayerName: prayer.name),
               ],
             ),
           );
@@ -599,4 +617,48 @@ class _PrayerTime {
     required this.time,
     required this.icon,
   });
+}
+
+class _BellToggle extends ConsumerWidget {
+  final String prayerName;
+  const _BellToggle({required this.prayerName});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(prayerReminderSettingsProvider);
+    final enabled = settings.isEnabled(prayerName);
+
+    return IconButton(
+      icon: Icon(
+        enabled
+            ? Icons.notifications_active
+            : Icons.notifications_none_outlined,
+        size: 20,
+        color: enabled ? Theme.of(context).colorScheme.primary : null,
+      ),
+      tooltip: enabled ? 'Disable reminder' : 'Enable reminder',
+      visualDensity: VisualDensity.compact,
+      onPressed: () async {
+        await ref
+            .read(prayerReminderSettingsProvider.notifier)
+            .togglePrayer(prayerName);
+        final updated = ref.read(prayerReminderSettingsProvider);
+        await PrayerReminderService.scheduleAllReminders(updated);
+
+        if (context.mounted) {
+          final nowEnabled = updated.isEnabled(prayerName);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                nowEnabled
+                    ? '$prayerName reminder enabled'
+                    : '$prayerName reminder disabled',
+              ),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      },
+    );
+  }
 }

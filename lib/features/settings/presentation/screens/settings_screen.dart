@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../audio/presentation/screens/downloads_screen.dart';
 import '../../../donate/presentation/screens/donate_screen.dart';
+import '../../../prayer_times/presentation/screens/prayer_notification_settings_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -81,6 +82,21 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(currentReciter.name),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showReciterPicker(context, ref, currentReciter),
+          ),
+
+          // ─── Notifications ───
+          _SectionHeader(title: 'Notifications'),
+          ListTile(
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('Prayer Reminders'),
+            subtitle: const Text('Get notified before prayer times'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PrayerNotificationSettingsScreen(),
+              ),
+            ),
           ),
 
           // ─── Data ───
