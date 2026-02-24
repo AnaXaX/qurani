@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/utils/hijri_utils.dart';
 import '../../../../core/utils/page_transitions.dart';
+import '../../../islamic_events/data/models/islamic_event.dart';
+import '../../../islamic_events/presentation/providers/islamic_events_providers.dart';
 import '../../../../shared/widgets/animated_counter.dart';
 import '../../../../shared/widgets/gradient_header.dart';
 import '../../../../shared/widgets/feature_tile.dart';
@@ -191,6 +194,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 4),
+                // Hijri date
+                Center(
+                  child: Text(
+                    gregorianToHijri(DateTime.now()).formatCompact(),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withAlpha(180),
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 Center(
                   child: Text(
@@ -239,6 +253,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 // ── Streak & Daily Goals Card ──
                 const _StreakGoalsCard(),
                 const SizedBox(height: 16),
+
+                // ── Upcoming Islamic Event ──
+                _UpcomingEventCard(
+                  event: ref.watch(nextMajorEventProvider),
+                  todayEvent: ref.watch(todayEventProvider),
+                ),
 
                 // ── Continue Reading ──
                 lastPosition.when(
@@ -650,6 +670,116 @@ class _AchievementsPreview extends ConsumerWidget {
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+// ── Upcoming Islamic Event Card ──
+
+class _UpcomingEventCard extends StatelessWidget {
+  final IslamicEvent? event;
+  final IslamicEvent? todayEvent;
+
+  const _UpcomingEventCard({this.event, this.todayEvent});
+
+  @override
+  Widget build(BuildContext context) {
+    final displayEvent = todayEvent ?? event;
+    if (displayEvent == null) return const SizedBox.shrink();
+    if (todayEvent == null && (displayEvent.daysUntil ?? 999) > 60) {
+      return const SizedBox.shrink();
+    }
+
+    final isToday = displayEvent.daysUntil == 0;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final daysText = isToday
+        ? 'Today!'
+        : '${displayEvent.daysUntil} day${displayEvent.daysUntil == 1 ? '' : 's'}';
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const HijriScreen()),
+        ),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? AppColors.gradientGoldDark
+                  : AppColors.gradientGold,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(40),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.calendar_month_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayEvent.name,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      displayEvent.nameArabic,
+                      style: TextStyle(
+                        fontFamily: 'AmiriQuran',
+                        fontSize: 14,
+                        color: Colors.white.withAlpha(200),
+                      ),
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isToday
+                      ? Colors.white.withAlpha(50)
+                      : Colors.white.withAlpha(30),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  daysText,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white.withAlpha(230),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
