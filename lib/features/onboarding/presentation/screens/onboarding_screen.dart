@@ -522,6 +522,14 @@ class _PreferencesPage extends ConsumerWidget {
             subtitle: _fontSizeLabel(fontSize),
             onTap: () => _showFontSizePicker(context, ref),
           ),
+          _PreferenceCard(
+            icon: Icons.open_in_new_rounded,
+            title: 'App Startup',
+            subtitle: ref.watch(startupScreenProvider) == StartupScreen.home
+                ? 'Home Screen'
+                : 'Last Reading Position',
+            onTap: () => _showStartupPicker(context, ref),
+          ),
           const SizedBox(height: 12),
           Text(
             'You can change these anytime in Settings.',
@@ -543,6 +551,50 @@ class _PreferencesPage extends ConsumerWidget {
       if (option.size == size) return '${option.label} (${size.toInt()})';
     }
     return '${size.toInt()}';
+  }
+
+  void _showStartupPicker(BuildContext context, WidgetRef ref) {
+    final current = ref.read(startupScreenProvider);
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<StartupScreen>(
+              value: StartupScreen.home,
+              groupValue: current,
+              title: const Text('Home Screen'),
+              subtitle: const Text('Always open to the dashboard'),
+              onChanged: (_) {
+                ref
+                    .read(startupScreenProvider.notifier)
+                    .setStartupScreen(StartupScreen.home);
+                Navigator.pop(sheetContext);
+              },
+            ),
+            RadioListTile<StartupScreen>(
+              value: StartupScreen.lastPosition,
+              groupValue: current,
+              title: const Text('Last Reading Position'),
+              subtitle: const Text('Continue right where you left off'),
+              onChanged: (_) {
+                ref
+                    .read(startupScreenProvider.notifier)
+                    .setStartupScreen(StartupScreen.lastPosition);
+                Navigator.pop(sheetContext);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showTranslationPicker(BuildContext context, WidgetRef ref) {

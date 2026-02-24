@@ -942,6 +942,16 @@ Widget infrastructure:
 - SharedPreferences key: `startup_screen`
 - Will be wired into onboarding + settings + app.dart in next commit
 
+### Startup Screen Preference
+- `StartupScreen` enum (home, lastPosition) + `startupScreenProvider` with SharedPreferences
+- Onboarding Page 4: "App Startup" preference card with bottom sheet picker
+- Settings screen: "App Startup" ListTile in Quran Reading section
+- `app.dart`: after splash + onboarding, checks preference and pushes ReadingScreen at saved position
+- Graceful fallback: if no reading history exists, stays on home screen
+
 ### Files Modified
 - `lib/core/providers/reading_preferences_provider.dart` — added ReadingMode, readingModeProvider, StartupScreen, startupScreenProvider
 - `lib/features/quran/presentation/screens/reading_screen.dart` — complete rewrite with auto-save, mode sync, audio follow
+- `lib/features/onboarding/presentation/screens/onboarding_screen.dart` — added App Startup preference card + picker
+- `lib/features/settings/presentation/screens/settings_screen.dart` — added App Startup setting + picker
+- `lib/app.dart` — added startup redirect logic for last reading position

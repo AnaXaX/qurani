@@ -73,6 +73,16 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showNumeralStylePicker(context, ref),
           ),
+          ListTile(
+            leading: const Icon(Icons.open_in_new_rounded),
+            title: const Text('App Startup'),
+            subtitle: Text(
+                ref.watch(startupScreenProvider) == StartupScreen.home
+                    ? 'Home Screen'
+                    : 'Last Reading Position'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showStartupPicker(context, ref),
+          ),
 
           // ─── Audio ───
           _SectionHeader(title: 'Audio'),
@@ -460,6 +470,65 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Startup Screen Picker ───
+
+  void _showStartupPicker(BuildContext context, WidgetRef ref) {
+    final current = ref.read(startupScreenProvider);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _bottomSheetHandle(),
+            const SizedBox(height: 20),
+            Text(
+              'App Startup',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            RadioListTile<StartupScreen>(
+              value: StartupScreen.home,
+              groupValue: current,
+              title: const Text('Home Screen'),
+              subtitle: const Text('Always open to the dashboard'),
+              onChanged: (value) {
+                if (value != null) {
+                  ref
+                      .read(startupScreenProvider.notifier)
+                      .setStartupScreen(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            RadioListTile<StartupScreen>(
+              value: StartupScreen.lastPosition,
+              groupValue: current,
+              title: const Text('Last Reading Position'),
+              subtitle: const Text('Continue right where you left off'),
+              onChanged: (value) {
+                if (value != null) {
+                  ref
+                      .read(startupScreenProvider.notifier)
+                      .setStartupScreen(value);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );

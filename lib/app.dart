@@ -3,11 +3,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/l10n/app_localizations.dart';
 import 'core/l10n/locale_provider.dart';
+import 'core/providers/reading_preferences_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
+import 'features/bookmarks/presentation/providers/bookmark_providers.dart';
 import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'features/onboarding/presentation/screens/splash_screen.dart';
+import 'features/quran/data/models/surah_info.dart';
+import 'features/quran/presentation/screens/reading_screen.dart';
 
 class QuranApp extends ConsumerStatefulWidget {
   const QuranApp({super.key});
@@ -18,6 +22,7 @@ class QuranApp extends ConsumerStatefulWidget {
 
 class _QuranAppState extends ConsumerState<QuranApp> {
   bool _showSplash = true;
+  bool _startupHandled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +70,32 @@ class _QuranAppState extends ConsumerState<QuranApp> {
                 ),
               );
             }
+
+            // Handle "Last Reading Position" startup preference
+            if (!_startupHandled) {
+              _startupHandled = true;
+              final startupPref = ref.read(startupScreenProvider);
+              if (startupPref == StartupScreen.lastPosition) {
+                final nav = Navigator.of(context);
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  final position =
+                      await ref.read(lastReadingPositionProvider.future);
+                  if (position != null && mounted) {
+                    final surah = SurahInfo.all.firstWhere(
+                      (s) => s.number == position.surahId,
+                      orElse: () => SurahInfo.all.first,
+                    );
+                    nav.push(MaterialPageRoute(
+                      builder: (_) => ReadingScreen(
+                        surah: surah,
+                        initialAyah: position.ayahNumber,
+                      ),
+                    ));
+                  }
+                });
+              }
+            }
+
             return child!;
           },
         );
