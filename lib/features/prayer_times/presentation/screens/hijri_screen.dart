@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/hijri_utils.dart';
+import '../../../islamic_events/data/models/islamic_event.dart';
+import '../../../islamic_events/presentation/providers/islamic_events_providers.dart';
 
-/// Hijri calendar screen with date display and conversion.
-class HijriScreen extends StatefulWidget {
+/// Hijri calendar screen with date display, conversion, and events timeline.
+class HijriScreen extends ConsumerStatefulWidget {
   const HijriScreen({super.key});
 
   @override
-  State<HijriScreen> createState() => _HijriScreenState();
+  ConsumerState<HijriScreen> createState() => _HijriScreenState();
 }
 
-class _HijriScreenState extends State<HijriScreen> {
+class _HijriScreenState extends ConsumerState<HijriScreen> {
   late DateTime _selectedDate;
 
   @override
@@ -247,9 +250,62 @@ class _HijriScreenState extends State<HijriScreen> {
               ),
             );
           }),
+          const SizedBox(height: 24),
+          // ── Upcoming Islamic Events ──
+          _buildEventsSection(),
           const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+
+  Widget _buildEventsSection() {
+    final events = ref.watch(upcomingEventsProvider);
+    if (events.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Upcoming Events',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withAlpha(30),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${events.length}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Dates may vary based on local moon sighting',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withAlpha(128),
+                fontStyle: FontStyle.italic,
+              ),
+        ),
+        const SizedBox(height: 12),
+        ...events.map((event) => _EventTimelineItem(event: event)),
+      ],
     );
   }
 
@@ -270,5 +326,136 @@ class _HijriScreenState extends State<HijriScreen> {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[d.month - 1]} ${d.day}';
+  }
+}
+
+class _EventTimelineItem extends StatelessWidget {
+  final IslamicEvent event;
+  const _EventTimelineItem({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final isToday = event.daysUntil == 0;
+    final isPast = (event.daysUntil ?? 0) < 0;
+    final isMajor = event.isMajor;
+
+    final dotColor = isMajor
+        ? Colors.amber.shade700
+        : Theme.of(context).colorScheme.primary;
+
+    final daysText = isToday
+        ? 'Today!'
+        : '${event.daysUntil} day${event.daysUntil == 1 ? '' : 's'}';
+
+    return Opacity(
+      opacity: isPast ? 0.5 : 1.0,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isToday
+              ? Colors.amber.withAlpha(20)
+              : isMajor
+                  ? Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withAlpha(40)
+                  : null,
+          borderRadius: BorderRadius.circular(12),
+          border: isMajor
+              ? Border.all(
+                  color: isToday
+                      ? Colors.amber.withAlpha(120)
+                      : Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withAlpha(60),
+                )
+              : null,
+        ),
+        child: Row(
+          children: [
+            // Timeline dot
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Event info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.name,
+                    style: TextStyle(
+                      fontWeight: isMajor ? FontWeight.bold : FontWeight.w500,
+                      fontSize: isMajor ? 15 : 14,
+                    ),
+                  ),
+                  Text(
+                    event.nameArabic,
+                    style: TextStyle(
+                      fontFamily: 'AmiriQuran',
+                      fontSize: 14,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withAlpha(160),
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  if (event.gregorianDate != null)
+                    Text(
+                      '${event.hijriDay} ${hijriMonthNames[(event.hijriMonth - 1).clamp(0, 11)]} | ${_formatDate(event.gregorianDate!)}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(120),
+                          ),
+                    ),
+                ],
+              ),
+            ),
+            // Countdown badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: isToday
+                    ? Colors.amber.withAlpha(40)
+                    : Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withAlpha(128),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                daysText,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isToday
+                      ? Colors.amber.shade800
+                      : Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime d) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
 }
