@@ -52,11 +52,11 @@
 - Live countdown to next prayer
 - Qibla compass with real-time direction
 
-### Du'as — 100+ Authentic Supplications
-- 12 categories: Morning, Evening, Sleep, Waking, Mosque, Eating, Travel, Rain, Healing, Forgiveness, Parents, Difficulty
-- Arabic text with transliteration and English translation
-- Authentic references from Quran, Bukhari, Muslim, and more
-- Tap-to-count for repeated du'as, copy to clipboard
+### Du'as — 23 Curated Supplication Categories
+- API-powered from HisnMuslim (Fortress of the Muslim)
+- Categories: Istikhara, Anxiety, Distress, Travel, Sickness, Tawbah, Hajj, and more
+- Arabic text with tap-to-count for repeated du'as
+- Copy to clipboard, celebration on category completion
 
 ### Ahkam — Islamic Rulings (4 Madhabs)
 - 8 categories: Purification, Prayer, Fasting, Zakat, Hajj, Marriage, Food, Daily Life
@@ -64,15 +64,17 @@
 - Quran and Hadith evidence for each position
 - 40+ topics with expandable details and key points
 
-### Ahadith — Hadith Collections
+### Ahadith — 40,000+ Hadiths via API
 - 6 major collections: Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah
-- Arabic text with English translation
-- Narrator chains and authenticity grading (Sahih, Hasan, Da'if)
-- Fully offline — all data bundled in the app
+- API-powered from Fawaz Ahmed Hadith CDN (no API key needed)
+- Arabic text with English translation, organized by sections/chapters
+- Cached locally on first view for offline access
 
-### Azkar & Tasbih
-- Morning, evening, after salah, and sleep azkar
-- Built-in tasbih counter with haptic feedback
+### Azkar — 132 Categories from Hisn al-Muslim
+- API-powered from HisnMuslim (complete Fortress of the Muslim)
+- 132 categories: morning, evening, prayer, sleep, travel, rain, sickness, and more
+- Searchable category grid with tap-to-count tasbih counter
+- Cached locally on first view for offline access
 
 ### Memorization (Hifz)
 - Progressive verse hiding (3 difficulty levels)
@@ -111,6 +113,8 @@
 | [Al Quran Cloud](https://alquran.cloud) | Fallback text and audio |
 | [MP3Quran](https://mp3quran.net) | 260+ reciters, surah-level audio |
 | [EveryAyah](https://everyayah.com) | Verse-by-verse audio |
+| [Fawaz Ahmed Hadith API](https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1) | 40,000+ hadiths, 6 collections |
+| [HisnMuslim API](https://www.hisnmuslim.com) | 132 azkar/du'a categories |
 
 ## Architecture
 
@@ -122,10 +126,10 @@ lib/
     audio/        # Player, reciters, downloads
     tajweed_course/ # 24 lessons, quizzes, recording
     prayer_times/ # Prayer times, Qibla, Hijri
-    azkar/        # Azkar with tasbih counter
-    duas/         # 100+ du'as across 12 categories
+    azkar/        # 132 azkar categories (HisnMuslim API)
+    duas/         # 23 du'a categories (HisnMuslim API)
     ahkam/        # Islamic rulings (4 madhabs)
-    ahadith/      # 6 hadith collections
+    ahadith/      # 40K+ hadiths, 6 collections (Hadith API)
     hifz/         # Memorization mode
     reading_plans/# Khatmah plans
     settings/     # App settings, more screen

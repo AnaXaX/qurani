@@ -102,8 +102,8 @@
 
 - [x] `SettingsScreen` - Theme picker, translation, audio, data, about
 - [x] `MoreScreen` - Feature grid (6 tiles) + settings/donate links
-- [x] `AzkarScreen` - 4 categories (morning, evening, after salah, sleep)
-- [x] Azkar list with tap-to-count tasbih counter + haptic feedback
+- [x] `AzkarScreen` - 132 categories from Hisn al-Muslim (API-powered, cached on view)
+- [x] Azkar detail with tap-to-count tasbih counter + haptic feedback + celebration
 - [x] `PrayerTimesScreen` - Real prayer times via adhan_dart + geolocator (12 calc methods, live countdown)
 - [x] `TafsirScreen` - Quran.com API + Al Quran Cloud fallback, HTML stripping
 - [x] Tafsir button wired into ReadingScreen ayah actions
@@ -215,8 +215,8 @@ Learn tajweed with a structured 24-lesson course covering beginner, intermediate
 PRAYER TIMES & QIBLA
 Accurate prayer times calculated offline from your GPS location — no internet needed. 12 calculation methods (MWL, Egyptian, Umm Al-Qura, ISNA, and more). Live countdown to next prayer. Qibla compass with real-time direction to the Kaaba.
 
-AZKAR & TASBIH
-Morning and evening azkar, after salah azkar, and sleep azkar with built-in tasbih counter and haptic feedback.
+AZKAR — 132 CATEGORIES
+Complete Hisn al-Muslim (Fortress of the Muslim) with 132 categories of azkar. Morning, evening, prayer, travel, sleep, sickness, and more. Tap-to-count tasbih with haptic feedback. Cached for offline use.
 
 MEMORIZATION (HIFZ)
 Memorize the Quran with progressive verse hiding. 3 difficulty levels: easy (first word shown), medium (fully hidden), and hard (type from memory).
@@ -236,6 +236,8 @@ MORE FEATURES
 WHY QURANI?
 • 100% FREE — no ads, no subscriptions, no premium
 • 260+ reciters (competitors have 10-20)
+• 40,000+ hadiths from 6 authentic collections
+• 132 azkar categories from Hisn al-Muslim
 • Full tajweed course (no other app teaches all 24 rules for free)
 • Offline prayer times (pure math, no API dependency)
 • Built with love as Sadaqah Jariyah
@@ -285,6 +287,8 @@ DATA WE DO NOT COLLECT:
 NETWORK USAGE:
 - Quran text and translations: fetched from Quran.com and Al Quran Cloud APIs
 - Audio streaming: fetched from MP3Quran.net and EveryAyah.com CDNs
+- Hadiths: fetched from Fawaz Ahmed Hadith API (CDN-hosted)
+- Azkar and Du'as: fetched from HisnMuslim API
 - All fetched data is cached locally for offline use
 
 PERMISSIONS:
@@ -342,9 +346,9 @@ Built with Flutter as Sadaqah Jariyah (ongoing charity).
 - Live countdown to next prayer
 - Qibla compass with real-time direction
 
-### Azkar & Tasbih
-- Morning, evening, after salah, and sleep azkar
-- Built-in tasbih counter with haptic feedback
+### Azkar — 132 Categories (Hisn al-Muslim)
+- API-powered from HisnMuslim, cached locally for offline
+- Searchable category grid with tap-to-count tasbih counter
 
 ### Memorization (Hifz)
 - Progressive verse hiding (3 difficulty levels)
@@ -459,6 +463,8 @@ MIT License — free to use, modify, and distribute.
 | EveryAyah | `https://everyayah.com/data` | None | Offline MP3 downloads |
 | Tanzil.net | `https://tanzil.net` | None | Bundled text data |
 | QuranHub | `https://api.quranhub.com` | None | 156+ tafsir editions |
+| Fawaz Ahmed Hadith API | `https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1` | None | 40,000+ hadiths, 6 collections |
+| HisnMuslim API | `https://www.hisnmuslim.com` | None | 132 azkar/du'a categories |
 
 ## Key Files Reference
 | File | Purpose |
@@ -471,7 +477,7 @@ MIT License — free to use, modify, and distribute.
 | `lib/core/constants/tajweed_colors.dart` | 17 tajweed rule colors + info |
 | `lib/core/network/api_client.dart` | Dio clients for all APIs |
 | `lib/core/network/api_orchestrator.dart` | Multi-API fallback logic |
-| `lib/core/database/app_database.dart` | Drift database (12 tables) |
+| `lib/core/database/app_database.dart` | Drift database (15 tables, schema v3) |
 | `lib/shared/widgets/app_shell.dart` | Scaffold + bottom nav + mini player |
 | `lib/features/quran/presentation/screens/reading_screen.dart` | 3-mode reader |
 | `lib/features/quran/presentation/screens/quran_browse_screen.dart` | Surah/Juz/Page browse |
@@ -496,7 +502,18 @@ MIT License — free to use, modify, and distribute.
 | `lib/features/tajweed_course/presentation/screens/quiz_screen.dart` | Quiz system |
 | `lib/features/settings/presentation/screens/settings_screen.dart` | App settings |
 | `lib/features/settings/presentation/screens/more_screen.dart` | More menu |
-| `lib/features/azkar/presentation/screens/azkar_screen.dart` | Azkar + tasbih |
+| `lib/features/azkar/data/services/azkar_api_service.dart` | HisnMuslim API service |
+| `lib/features/azkar/data/repositories/azkar_repository.dart` | Offline-first azkar repo |
+| `lib/features/azkar/data/models/azkar_models.dart` | 132 azkar categories |
+| `lib/features/azkar/presentation/providers/azkar_providers.dart` | Azkar Riverpod providers |
+| `lib/features/azkar/presentation/screens/azkar_screen.dart` | Azkar categories (132) |
+| `lib/features/azkar/presentation/screens/azkar_detail_screen.dart` | Azkar detail + tasbih |
+| `lib/features/duas/data/services/duas_api_service.dart` | HisnMuslim API for du'as |
+| `lib/features/duas/data/repositories/duas_repository.dart` | Offline-first du'as repo |
+| `lib/features/duas/presentation/providers/duas_providers.dart` | Du'as Riverpod providers |
+| `lib/features/ahadith/data/services/hadith_api_service.dart` | Hadith API service (40K+) |
+| `lib/features/ahadith/data/repositories/hadith_repository.dart` | Offline-first hadith repo |
+| `lib/features/ahadith/presentation/providers/hadith_providers.dart` | Hadith Riverpod providers |
 | `lib/features/prayer_times/presentation/screens/prayer_times_screen.dart` | Prayer times |
 | `lib/features/prayer_times/presentation/screens/qibla_screen.dart` | Qibla compass |
 | `lib/features/prayer_times/presentation/screens/hijri_screen.dart` | Hijri calendar |
@@ -551,6 +568,7 @@ MIT License — free to use, modify, and distribute.
 34. `c6df3ff` - Background audio playback with notification and lock screen controls
 35. `6a390eb` - UI polish: reciter mic icons with unique colors, fix localization
 36. `cee6ecd` - Fresh repo: clean single-commit push to GitHub (anasBoudyach/Qurani)
+37. `990bae6` - Replace hardcoded Islamic content with API-powered data (Ahadith 40K+, Azkar 132 categories, Du'as 23 categories)
 
 ## Session Work (Feb 22, 2026)
 
@@ -717,3 +735,74 @@ MIT License — free to use, modify, and distribute.
 - Added `background.png` to `assets/store/`
 - Updated README with feature graphic banner, app icon, badges, and GitHub Sponsors link
 - Added GitHub Sponsors donation option to DonateScreen
+
+## Session Work (Feb 24, 2026) — API-Powered Islamic Content Expansion
+
+### Problem
+- Azkar: only 16 hardcoded items in 4 categories
+- Du'as: only 102 hardcoded items in 12 categories
+- Ahadith: only ~90 hardcoded items in 6 collections (3 books each, 5 hadiths per book)
+- Competitive apps have thousands of hadiths and hundreds of azkar
+
+### Solution: API-First, Cache-on-View Architecture
+- **No bundled JSON files** — all content fetched from APIs on first view
+- **Drift DB caching** — content cached locally only when user views it (offline access)
+- **All hardcoded data deleted** — app is lighter, content always up-to-date
+
+### New APIs Integrated
+| API | Base URL | Content |
+|-----|----------|---------|
+| Fawaz Ahmed Hadith API | `cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1` | 40,000+ hadiths, 6 collections, no API key |
+| HisnMuslim API | `www.hisnmuslim.com/api/ar/{id}.json` | 132 categories of azkar & du'as, no API key |
+
+### Ahadith Overhaul (40,000+ hadiths)
+- `hadith_api_service.dart`: Fetches sections + hadiths from Fawaz Ahmed CDN (Arabic + English parallel)
+- `hadith_repository.dart`: Offline-first (DB → API → cache) for sections and hadiths
+- `hadith_providers.dart`: Riverpod FutureProvider.family for sections + hadith lists
+- `hadith_collection_screen.dart`: Rewritten — shows all sections from API with loading shimmer
+- `hadith_list_screen.dart`: Rewritten — shows hadiths with Arabic + English, copy button
+- 6 collections: Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasai, Ibn Majah
+
+### Azkar Overhaul (132 categories from Hisn al-Muslim)
+- `azkar_api_service.dart`: Fetches azkar items from HisnMuslim API
+- `azkar_repository.dart`: Offline-first (DB → API → cache) using CachedAzkar table
+- `azkar_providers.dart`: Riverpod FutureProvider.family for azkar lists
+- `azkar_models.dart`: 132 categories with unique icons and colors
+- `azkar_screen.dart`: Rewritten — searchable grid of all 132 categories
+- `azkar_detail_screen.dart`: New — tap-to-count with counters and celebration overlay
+
+### Du'as Overhaul (23 curated supplication categories)
+- `duas_api_service.dart`: Uses same HisnMuslim API for supplication categories
+- `duas_repository.dart`: Reuses CachedAzkar table (same API source)
+- `duas_providers.dart`: 23 curated du'a categories (Istikhara, Anxiety, Travel, Sickness, etc.)
+- `dua_list_screen.dart`: Rewritten — loads from API with counter + celebration
+- `duas_screen.dart`: Updated to use new category model
+
+### Database Changes
+- Schema v2 → v3 migration with 3 new cache tables:
+  - `CachedHadithSections`: collectionKey, sectionNumber, name, hadithStartNumber, hadithEndNumber
+  - `CachedHadiths`: collectionKey, sectionNumber, hadithNumber, textArabic, textEnglish
+  - `CachedAzkar`: categoryId, categoryTitle, itemId, arabicText, repeatCount, audioUrl
+- New query methods: `getHadithSections()`, `getHadithsForSection()`, `getAzkarForCategory()`
+- API client: added `hadithApiDio` and `hisnMuslimDio` Dio instances
+
+### Files Deleted (lighter app)
+- `lib/features/ahadith/data/ahadith_data.dart` (1035 lines of hardcoded hadiths)
+- `lib/features/ahadith/data/models/hadith.dart` (58 lines)
+- `lib/features/duas/data/duas_data.dart` (1044 lines of hardcoded du'as)
+- `lib/features/duas/data/models/dua.dart` (31 lines)
+- **Total: ~2,168 lines of hardcoded data removed**
+
+### New Files Created (12)
+1. `lib/features/ahadith/data/services/hadith_api_service.dart`
+2. `lib/features/ahadith/data/repositories/hadith_repository.dart`
+3. `lib/features/ahadith/presentation/providers/hadith_providers.dart`
+4. `lib/features/azkar/data/models/azkar_models.dart`
+5. `lib/features/azkar/data/services/azkar_api_service.dart`
+6. `lib/features/azkar/data/repositories/azkar_repository.dart`
+7. `lib/features/azkar/presentation/providers/azkar_providers.dart`
+8. `lib/features/azkar/presentation/screens/azkar_detail_screen.dart`
+9. `lib/features/duas/data/services/duas_api_service.dart`
+10. `lib/features/duas/data/repositories/duas_repository.dart`
+11. `lib/features/duas/presentation/providers/duas_providers.dart`
+12. (Du'as model removed — uses CachedAzkarData from Drift directly)
