@@ -72,7 +72,9 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
     if (a.length != b.length) return false;
     for (int i = 0; i < a.length; i++) {
       if (a[i].surahId != b[i].surahId ||
-          a[i].ayahNumber != b[i].ayahNumber) return false;
+          a[i].ayahNumber != b[i].ayahNumber) {
+        return false;
+      }
     }
     return true;
   }
