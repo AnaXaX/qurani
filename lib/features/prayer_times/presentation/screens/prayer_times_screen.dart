@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/prayer_reminder_provider.dart';
 import '../../data/prayer_reminder_service.dart';
+import '../../../widgets/home_widget_service.dart';
 import 'prayer_notification_settings_screen.dart';
 
 /// Prayer times screen using adhan_dart for offline calculation.
@@ -227,6 +228,14 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen> {
     });
 
     _startCountdown();
+
+    // Update the home screen Prayer Time widget with real data
+    final next = prayers[nextIdx];
+    HomeWidgetService.updatePrayerTimeWidget(
+      prayerName: next.name,
+      prayerTime: _formatTime(next.time),
+      countdown: 'in $_countdown',
+    );
   }
 
   void _startCountdown() {
