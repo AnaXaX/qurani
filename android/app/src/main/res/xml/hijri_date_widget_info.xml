@@ -4,6 +4,7 @@
     android:minHeight="110dp"
     android:updatePeriodMillis="43200000"
     android:initialLayout="@layout/hijri_date_widget"
+    android:previewImage="@drawable/preview_hijri_date_widget"
     android:previewLayout="@layout/hijri_date_widget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
