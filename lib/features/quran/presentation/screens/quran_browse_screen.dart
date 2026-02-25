@@ -183,7 +183,8 @@ class _QuranBrowseScreenState extends State<QuranBrowseScreen>
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ReadingScreen(surah: surah),
+                builder: (_) => ReadingScreen(
+                      surah: surah, initialPage: pageNumber),
               ),
             );
           },

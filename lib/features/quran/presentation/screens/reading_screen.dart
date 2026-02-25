@@ -21,11 +21,13 @@ import 'tafsir_screen.dart';
 class ReadingScreen extends ConsumerStatefulWidget {
   final SurahInfo surah;
   final int initialAyah;
+  final int? initialPage;
 
   const ReadingScreen({
     super.key,
     required this.surah,
     this.initialAyah = 1,
+    this.initialPage,
   });
 
   @override
@@ -365,6 +367,13 @@ class _ReadingScreenState extends ConsumerState<ReadingScreen>
             // Cache ayahs for synchronization and scroll tracking
             _loadedAyahs = ayahs;
             _buildPageMap(ayahs);
+
+            // Resolve initialPage → first ayah on that page
+            if (widget.initialPage != null &&
+                _currentAyah <= 1 &&
+                _pageMap!.containsKey(widget.initialPage)) {
+              _currentAyah = _pageMap![widget.initialPage]!.first.ayahNumber;
+            }
 
             // Initialize page controller for mushaf if needed
             if (_mode == ReadingMode.mushaf && _pageController == null) {
