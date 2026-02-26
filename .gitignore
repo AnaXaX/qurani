@@ -1,6 +1,12 @@
 # Claude Code
 .claude/
 CLAUDE.md
+ALMOST_THERE.md
+
+# Release signing key (NEVER commit)
+*.jks
+*.keystore
+key.properties
 
 # Store listing (private, not for repo)
 STORE_LISTING.md

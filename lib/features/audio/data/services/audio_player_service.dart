@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
-import '../../../quran/data/models/surah_info.dart';
 
 /// Repeat mode for audio playback.
 enum AudioRepeatMode {
@@ -184,14 +182,7 @@ class AudioPlayerService {
       final paddedSurah = surahNumber.toString().padLeft(3, '0');
       final url = '$serverUrl$paddedSurah.mp3';
 
-      await _player.setAudioSource(AudioSource.uri(
-        Uri.parse(url),
-        tag: MediaItem(
-          id: 'surah_$surahNumber',
-          title: _surahName(surahNumber),
-          artist: reciterName ?? 'Qurani',
-        ),
-      ));
+      await _player.setAudioSource(AudioSource.uri(Uri.parse(url)));
       await _player.play();
     } catch (e) {
       _updateState(_state.copyWith(
@@ -227,14 +218,7 @@ class AudioPlayerService {
       final url =
           'https://everyayah.com/data/$reciterFolder/$paddedSurah$paddedAyah.mp3';
 
-      await _player.setAudioSource(AudioSource.uri(
-        Uri.parse(url),
-        tag: MediaItem(
-          id: 'ayah_${surahNumber}_$ayahNumber',
-          title: '${_surahName(surahNumber)} - Ayah $ayahNumber',
-          artist: reciterName ?? 'Mishary Alafasy',
-        ),
-      ));
+      await _player.setAudioSource(AudioSource.uri(Uri.parse(url)));
       await _player.play();
     } catch (e) {
       _updateState(_state.copyWith(
@@ -266,15 +250,7 @@ class AudioPlayerService {
         error: null,
       ));
 
-      final title = surahNumber != null ? _surahName(surahNumber) : 'Qurani';
-      await _player.setAudioSource(AudioSource.file(
-        filePath,
-        tag: MediaItem(
-          id: 'local_${surahNumber ?? 0}',
-          title: title,
-          artist: reciterName ?? 'Qurani',
-        ),
-      ));
+      await _player.setAudioSource(AudioSource.file(filePath));
       await _player.play();
     } catch (e) {
       _updateState(_state.copyWith(
@@ -522,15 +498,6 @@ class AudioPlayerService {
     }
 
     _updateState(_state.copyWith(isPlaying: false));
-  }
-
-  // ─── Helpers ───
-
-  String _surahName(int surahNumber) {
-    return SurahInfo.all
-        .firstWhere((s) => s.number == surahNumber,
-            orElse: () => SurahInfo.all.first)
-        .nameTransliteration;
   }
 
   // ─── Cleanup ───
