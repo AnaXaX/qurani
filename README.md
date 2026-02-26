@@ -197,16 +197,16 @@ flutter build appbundle --release
 ## Screenshots
 
 <p align="center">
-  <img src="assets/store/screenshots/screen1_home.png" width="24%" />
-  <img src="assets/store/screenshots/screen5_tajweed.png" width="24%" />
-  <img src="assets/store/screenshots/screen2_audio.png" width="24%" />
-  <img src="assets/store/screenshots/screen6_hifz.png" width="24%" />
+  <img src="assets/store/screenshots_1.png" width="100%" alt="Qurani Screenshots - Home, Tajweed, Audio, Hifz"/>
 </p>
 <p align="center">
-  <img src="assets/store/screenshots/screen4_prayer.png" width="24%" />
-  <img src="assets/store/screenshots/screen8_tajweed_course.png" width="24%" />
-  <img src="assets/store/screenshots/screen7_ahadith.png" width="24%" />
-  <img src="assets/store/screenshots/screen3_ahkam.png" width="24%" />
+  <img src="assets/store/screenshots_2.png" width="100%" alt="Qurani Screenshots - Prayer Times, Tajweed Course, Ahadith, Ahkam"/>
+</p>
+<p align="center">
+  <img src="assets/store/screenshots_3.png" width="100%" alt="Qurani Screenshots - Overview 1"/>
+</p>
+<p align="center">
+  <img src="assets/store/screenshots_4.png" width="100%" alt="Qurani Screenshots - Overview 2"/>
 </p>
 
 ## Contributing
@@ -218,11 +218,15 @@ This is a Sadaqah Jariyah project. Contributions are welcome:
 
 ## Support
 
-This app is free and will always be free. If you'd like to support the project:
-- [**Sponsor on GitHub**](https://github.com/sponsors/anasBoudyach) — one-time or monthly
-- Make dua for the developers
+This app is free and will always be free — no ads, no subscriptions. If you'd like to support the project:
+
+- [**GoFundMe**](https://gofund.me/e9c3f292) — help bring Qurani to more platforms
+- [**GitHub Sponsors**](https://github.com/sponsors/anasBoudyach) — one-time or monthly
+- [**Buy Me a Coffee**](https://buymeacoffee.com/anasboudyach) — one-time or monthly
+- [**PayPal**](https://paypal.me/AnasBOUDYACH) — direct donation
+- [**Rate on Google Play**](https://play.google.com/store/apps/details?id=com.qurani) — free way to support
 - Share the app with others
-- Leave a review on the Play Store
+- Make dua for the developers
 
 ## Privacy Policy
 
