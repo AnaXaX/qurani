@@ -230,7 +230,7 @@ This app is free and will always be free — no ads, no subscriptions. If you'd 
 
 ## Privacy Policy
 
-See [Privacy Policy](https://anas.boudyach.com/privacy/)
+See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) | [Website](https://anas.boudyach.com/privacy/)
 
 ## License
 
