@@ -230,11 +230,15 @@ This app is free and will always be free — no ads, no subscriptions. If you'd 
 
 ## Privacy Policy
 
-See [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
+See [Privacy Policy](https://anas.boudyach.com/privacy/)
 
 ## License
 
-MIT License — free to use, modify, and distribute.
+Copyright (c) 2026 Anas Boudyach. All rights reserved.
+
+This source code is provided for educational and reference purposes only. You may **not** copy, modify, distribute, or use this code (in whole or in part) in any other project or product without explicit written permission from the author.
+
+See [LICENSE](LICENSE) for details.
 
 ---
 
