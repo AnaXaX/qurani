@@ -125,6 +125,13 @@ class DonateScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _DonationOption(
+            icon: Icons.volunteer_activism_rounded,
+            title: 'GoFundMe',
+            subtitle: 'Help bring Qurani to more platforms',
+            color: const Color(0xFF00B964),
+            onTap: () => _launchUrl('https://gofund.me/e9c3f292'),
+          ),
+          _DonationOption(
             icon: Icons.favorite_rounded,
             title: 'GitHub Sponsors',
             subtitle: 'One-time or monthly support',
